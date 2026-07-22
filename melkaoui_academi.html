@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melkaoui Académie — CCIS Formation 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --brand:#0d5c63; --brand2:#14919b; --accent:#e0a458; --bg:#f4f6f8; --panel:#ffffff;
+  --ink:#1b2733; --muted:#64748b; --line:#e2e8f0; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  --sidebar:#0d3b40;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+html[dir="rtl"] body{font-family:'Segoe UI',Tahoma,'Traditional Arabic',sans-serif}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--brand2);text-decoration:none}
+.hidden{display:none!important}
+
+/* LOGIN */
+#login{position:fixed;inset:0;background:linear-gradient(135deg,#0d3b40,#14919b);display:flex;align-items:center;justify-content:center;z-index:50}
+.login-card{background:#fff;width:380px;max-width:92vw;border-radius:16px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:26px;margin:0 auto 14px}
+.login-card h1{font-size:19px;text-align:center;margin-bottom:2px}
+.login-card p.sub{text-align:center;color:var(--muted);font-size:12px;margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;color:var(--muted)}
+.field input,.field select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff}
+.btn{background:var(--brand);color:#fff;border:none;border-radius:9px;padding:11px 16px;font-weight:600;font-size:14px}
+.btn:hover{background:var(--brand2)}
+.btn-block{width:100%}
+.btn-ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:6px 11px;font-size:12.5px;border-radius:7px}
+.lang-switch{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.lang-switch button{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--muted)}
+.lang-switch button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.role-hint{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* APP LAYOUT */
+#app{display:flex;min-height:100vh}
+#sidebar{width:236px;background:var(--sidebar);color:#cfe3e5;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;overflow-y:auto;z-index:20}
+html[dir="rtl"] #sidebar{right:0;left:auto}
+html[dir="ltr"] #sidebar{left:0}
+.brand-box{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center}
+.brand-box .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--brand2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+.brand-box b{font-size:14px;color:#fff;line-height:1.1;display:block}
+.brand-box span{font-size:10.5px;color:#8fb6b9}
+.nav{padding:8px 0;flex:1}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 18px;color:#bcd6d9;font-size:13px;border-inline-start:3px solid transparent}
+.nav a .ic{width:18px;text-align:center;font-size:15px}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.active{background:rgba(20,145,155,.25);color:#fff;border-inline-start-color:var(--accent)}
+.nav .sep{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6f979b;padding:12px 18px 5px}
+#main{flex:1;margin-inline-start:236px;display:flex;flex-direction:column;min-width:0}
+.topbar{background:var(--panel);border-bottom:1px solid var(--line);padding:11px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.topbar h2{font-size:16px;flex:1}
+.topbar .who{font-size:12px;color:var(--muted);text-align:end}
+.topbar .who b{color:var(--ink);display:block;font-size:13px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--brand2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.content{padding:22px;max-width:1180px;width:100%}
+.hamb{display:none;background:none;border:none;font-size:20px;color:var(--ink)}
+
+/* CARDS / GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:13px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px}
+.kpi .v{font-size:24px;font-weight:800;color:var(--brand)}
+.kpi .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+.kpi .ic{float:inline-end;font-size:19px;opacity:.5}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:18px}
+.panel h3{font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-box{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px}
+.chart-box h4{font-size:13px;margin-bottom:10px;color:var(--muted)}
+.chart-box canvas{max-height:230px}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:start;padding:9px 11px;border-bottom:1px solid var(--line)}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#f8fafc}
+tr:hover td{background:#fafcfd}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge.A{background:#e0f2f1;color:#0d5c63}.badge.B{background:#fef3c7;color:#92400e}
+.badge.C{background:#ede9fe;color:#5b21b6}.badge.D{background:#dbeafe;color:#1e40af}
+.badge.ok{background:#dcfce7;color:#166534}.badge.warn{background:#fef3c7;color:#92400e}
+.badge.bad{background:#fee2e2;color:#991b1b}.badge.info{background:#e0f2fe;color:#075985}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select{padding:8px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+.grow{flex:1}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:6px 13px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:12.5px;color:var(--muted)}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+/* FORMATION CARDS */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
+.fcard{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:9px;transition:.15s}
+.fcard:hover{box-shadow:0 6px 18px rgba(0,0,0,.07);transform:translateY(-2px)}
+.fcard .top{display:flex;justify-content:space-between;align-items:start;gap:8px}
+.fcard .code{font-size:11px;color:var(--muted);font-weight:700}
+.fcard h4{font-size:14.5px;line-height:1.3}
+.fcard .meta{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:auto}
+.fcard ul{margin:2px 0 0;padding-inline-start:17px;font-size:12px;color:var(--muted);line-height:1.6}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px}
+.modal{background:#fff;border-radius:15px;max-width:620px;width:100%;max-height:88vh;overflow-y:auto;padding:24px}
+.modal.wide{max-width:900px}
+.modal h3{font-size:17px;margin-bottom:4px}
+.modal .close{float:inline-end;font-size:22px;color:var(--muted);background:none;border:none;line-height:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mt{margin-top:14px}
+.right{text-align:end}
+.gap{display:flex;gap:9px;flex-wrap:wrap}
+
+/* AUDIO PLAYER */
+.player{background:linear-gradient(135deg,#0d3b40,#14919b);color:#fff;border-radius:13px;padding:16px;margin-bottom:14px}
+.player .lbl{font-size:12px;opacity:.85;margin-bottom:8px}
+.player .ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.player button{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:9px;font-size:15px}
+.player button:hover{background:rgba(255,255,255,.3)}
+.player button.big{width:46px;height:46px;font-size:18px;background:var(--accent)}
+.player select,.player input[type=range]{accent-color:var(--accent)}
+.player .tag{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:20px;font-size:11px}
+
+/* LESSON */
+.lesson-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.lesson-nav button{padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:12.5px}
+.lesson-nav button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.lesson-body{font-size:14px;line-height:1.75}
+.lesson-body h4{margin:14px 0 6px;color:var(--brand)}
+.lesson-body ul{padding-inline-start:20px;margin:6px 0}
+.callout{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13px}
+
+/* QUIZ */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px;margin-bottom:12px}
+.q .qt{font-weight:600;margin-bottom:10px}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer}
+.opt:hover{background:#f8fafc}
+.opt.sel{border-color:var(--brand2);background:#e0f2f1}
+.opt.correct{border-color:var(--ok);background:#dcfce7}
+.opt.wrong{border-color:var(--bad);background:#fee2e2}
+.progress{height:8px;background:var(--line);border-radius:20px;overflow:hidden}
+.progress > i{display:block;height:100%;background:var(--brand2);border-radius:20px}
+
+/* CERTIFICATE */
+.cert{border:8px solid var(--brand);border-radius:6px;padding:34px;text-align:center;background:#fff;background-image:radial-gradient(circle at 10% 10%,#e0f2f1 0,transparent 40%),radial-gradient(circle at 90% 90%,#fef3c7 0,transparent 40%)}
+.cert .seal{width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;margin:0 auto 12px;font-size:22px}
+.cert h2{font-size:26px;color:var(--brand);letter-spacing:.03em}
+.cert .name{font-size:30px;font-weight:800;margin:16px 0;border-bottom:2px dashed var(--line);display:inline-block;padding-bottom:6px}
+.cert .sig-row{display:flex;justify-content:space-between;margin-top:34px;font-size:12px;color:var(--muted)}
+.cert .qr{width:70px;height:70px;image-rendering:pixelated;margin:14px auto 0}
+
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.rating{display:flex;gap:5px}
+.rating .star{font-size:24px;color:#cbd5e1;cursor:pointer}
+.rating .star.on{color:var(--accent)}
+.assistant-log{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:14px;height:320px;overflow-y:auto;margin-bottom:12px}
+.msg{margin-bottom:12px;max-width:85%}
+.msg.u{margin-inline-start:auto;text-align:end}
+.msg .bub{display:inline-block;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.5}
+.msg.u .bub{background:var(--brand);color:#fff}
+.msg.a .bub{background:#fff;border:1px solid var(--line)}
+.src{font-size:11px;color:var(--muted);margin-top:4px}
+
+@media(max-width:860px){
+  #sidebar{transform:translateX(-100%);transition:.25s;box-shadow:0 0 40px rgba(0,0,0,.3)}
+  html[dir="rtl"] #sidebar{transform:translateX(100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-inline-start:0}
+  .hamb{display:block}
+  .charts{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+}
+/* ===== THÈME SOMBRE ===== */
+html[data-theme="dark"]{ --bg:#0f172a; --panel:#1e293b; --ink:#e6edf5; --muted:#94a3b8; --line:#334155; --sidebar:#0b1220; }
+html[data-theme="dark"] th{background:#172033;color:#94a3b8}
+html[data-theme="dark"] tr:hover td{background:#243044}
+html[data-theme="dark"] .field input,html[data-theme="dark"] .field select,html[data-theme="dark"] textarea,
+html[data-theme="dark"] .toolbar input,html[data-theme="dark"] .toolbar select{background:#0f172a;color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .btn-ghost{background:#1e293b;color:#cfe0ee}
+html[data-theme="dark"] .btn-ghost:hover{background:#243044}
+html[data-theme="dark"] .chip{background:#1e293b;color:#94a3b8}
+html[data-theme="dark"] .modal{background:#1e293b}
+html[data-theme="dark"] .login-card{background:#1e293b}
+html[data-theme="dark"] .assistant-log{background:#0f172a}
+html[data-theme="dark"] .msg.a .bub{background:#0f172a;border-color:#334155}
+html[data-theme="dark"] .opt{background:#0f172a}
+html[data-theme="dark"] .opt:hover{background:#243044}
+html[data-theme="dark"] .callout{background:#3a300f;border-color:#5a4a17;color:#fde68a}
+html[data-theme="dark"] .kpi .l,html[data-theme="dark"] .chart-box h4{color:#94a3b8}
+html[data-theme="dark"] .cert{filter:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-logo">MA</div>
+    <h1 data-i="appName">Melkaoui Académie</h1>
+    <p class="sub">CCIS Formation 2026 — Marrakech-Safi</p>
+    <div class="field">
+      <label data-i="username">Identifiant</label>
+      <input id="loginUser" placeholder="admin" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="field">
+      <label data-i="password">Mot de passe</label>
+      <input id="loginPass" type="password" placeholder="••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginErr" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;padding:8px 11px;font-size:12.5px;margin-bottom:12px"></div>
+    <button class="btn btn-block" onclick="doLogin()" data-i="login">Se connecter</button>
+    <div class="lang-switch">
+      <button id="lgFR" class="on" onclick="setLang('fr')">Français</button>
+      <button id="lgAR" onclick="setLang('ar')">العربية</button>
+      <button id="themeBtnL" onclick="toggleTheme()" title="Thème clair/sombre">🌙</button>
+    </div>
+    <p class="role-hint" data-i="demoHint" style="text-align:center;margin-top:14px">Compte par défaut : <b>admin</b> / <b>admin</b> — à modifier après connexion.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <aside id="sidebar">
+    <div class="brand-box">
+      <div class="logo">MA</div>
+      <div><b data-i="appName">Melkaoui Académie</b><span>CCIS Formation 2026</span></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <div id="main">
+    <div class="topbar">
+      <button class="hamb" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <h2 id="pageTitle">Tableau de bord</h2>
+      <div class="lang-switch" style="margin:0">
+        <button id="tFR" class="on" onclick="setLang('fr')">FR</button>
+        <button id="tAR" onclick="setLang('ar')">ع</button>
+      </div>
+      <button id="themeBtn" class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Thème clair/sombre" style="font-size:15px;padding:6px 9px">🌙</button>
+      <div class="who"><b id="whoName">—</b><span id="whoRole">—</span></div>
+      <div class="avatar" id="whoAv">A</div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()" data-i="logout">Quitter</button>
+    </div>
+    <div class="content" id="view"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ================= DONNÉES ================= */
+const VILLES = ["Marrakech","Safi","El Kelâa des Sraghna","Essaouira","Youssoufia","Chichaoua","Rehamna"];
+const AXES = {
+  A:{fr:"Commerce numérique, marché & entrepreneuriat", ar:"التجارة الرقمية والسوق والمقاولة"},
+  B:{fr:"Qualité, gestion, finance & organisation", ar:"الجودة والتدبير والمالية والتنظيم"},
+  C:{fr:"Administration, numérique & infrastructure", ar:"الإدارة والرقمنة والبنية التحتية"},
+  D:{fr:"Communication & relations institutionnelles", ar:"التواصل والعلاقات المؤسساتية"}
+};
+const CATEGORIES = {
+  fr:["Ressortissant","Personnel","Membre élu","Chef d'entreprise","Porteur de projet","Représentant institutionnel"],
+  ar:["منخرط","موظف","عضو منتخب","صاحب مقاولة","حامل مشروع","ممثل مؤسساتي"]
+};
+// 20 formations (code, axe, durée jours, titre FR/AR, contenus FR)
+const FORMATIONS = [
+ {code:"F01",axe:"A",j:4,fr:"Réseaux sociaux dans le commerce électronique",ar:"مواقع التواصل الاجتماعي في التجارة الإلكترونية",c:["Transformation du commerce électronique","Influence des réseaux sociaux","Opportunités pour les entreprises","Risques et limites","Stratégies de réussite","Tendances futures"]},
+ {code:"F02",axe:"B",j:4,fr:"Contrôle qualité et productivité agroalimentaire",ar:"مراقبة الجودة والإنتاجية في الصناعة الغذائية",c:["Enjeux du secteur","Contrôle qualité","Productivité industrielle","Performance globale","Leviers d'amélioration","Études de cas"]},
+ {code:"F03",axe:"A",j:3,fr:"Transformation digitale dans l'accès aux marchés publics",ar:"التحول الرقمي في ولوج الصفقات العمومية",c:["Transformation digitale des marchés publics","Outils numériques","Impacts de la digitalisation","Limites et défis","Renforcement de la compétitivité"]},
+ {code:"F04",axe:"A",j:4,fr:"Prospection de partenaires en ligne B2B",ar:"التنقيب عن الشركاء عبر الإنترنت B2B",c:["Prospection B2B digitale","Utilisation de LinkedIn","IA appliquée à la prospection","Bonnes pratiques","Plan d'action commercial"]},
+ {code:"F05",axe:"A",j:3,fr:"Signature électronique pour les petites entreprises",ar:"التوقيع الإلكتروني للمقاولات الصغرى",c:["Signature électronique","Clé numérique","Gestion de certificats","Transactions officielles","Opportunités et limites"]},
+ {code:"F06",axe:"B",j:1,fr:"Gestion financière avec l'intelligence artificielle",ar:"التدبير المالي بالذكاء الاصطناعي",c:["Gestion financière numérique","Indicateurs financiers","IA appliquée à la finance","Analyse prédictive","Sécurité et éthique","Ateliers pratiques"]},
+ {code:"F07",axe:"A",j:2,fr:"Création et gestion d'une boutique en ligne",ar:"إنشاء وتدبير متجر إلكتروني",c:["Prérequis e-commerce","Choix de la plateforme","Catalogue, prix et stocks","Paiement et logistique","Marketing digital","Fidélisation client"]},
+ {code:"F08",axe:"A",j:5,fr:"Moyens de paiement et recouvrement",ar:"وسائل الأداء والتحصيل",c:["Moyens de paiement","Pilotage du recouvrement","Risques de gestion","Stratégies d'amélioration","Études de cas"]},
+ {code:"F09",axe:"A",j:5,fr:"Applications mobiles intelligentes et commerce de proximité",ar:"التطبيقات الذكية والتجارة القربية",c:["Commerce de proximité","Applications mobiles de pilotage","Impact sur la performance","Intelligence artificielle","Facteurs de réussite"]},
+ {code:"F10",axe:"B",j:1,fr:"Management de la qualité et amélioration continue",ar:"تدبير الجودة والتحسين المستمر",c:["Indicateurs de performance","Tableaux de bord","Surveillance des processus","Satisfaction client","Non-conformités","Actions correctives"]},
+ {code:"F11",axe:"D",j:1,fr:"Relations institutionnelles et partenaires publics/privés",ar:"العلاقات المؤسساتية والشركاء",c:["Principes des relations institutionnelles","Cartographie des partenaires","Communication professionnelle","Construction des partenariats","Négociation","Fidélisation"]},
+ {code:"F12",axe:"B",j:1,fr:"Audit externe",ar:"التدقيق الخارجي",c:["Principes de l'audit externe","Audit interne vs externe","Types d'audits","Préparation des dossiers","Constats et recommandations","Actions correctives"]},
+ {code:"F13",axe:"B",j:1,fr:"Gestion des stocks et approvisionnement",ar:"تدبير المخزون والتموين",c:["Typologie des stocks","Méthodes de valorisation","Classification ABC","Stocks min/max","Plan d'approvisionnement","Risques liés aux achats"]},
+ {code:"F14",axe:"C",j:1,fr:"Gestion du réseau informatique",ar:"تدبير الشبكة المعلوماتية",c:["Configuration des équipements","Gestion des utilisateurs","Serveurs et Wi-Fi","Maintenance préventive","Inventaire du parc","Gestion des pannes"]},
+ {code:"F15",axe:"B",j:1,fr:"Gouvernance financière et exécution budgétaire",ar:"الحكامة المالية وتنفيذ الميزانية",c:["Gouvernance financière","Cycle budgétaire","Élaboration du budget","Indicateurs et tableaux de bord","Analyse des écarts","Reporting financier"]},
+ {code:"F16",axe:"C",j:1,fr:"Numérisation et modernisation des procédures administratives",ar:"رقمنة وتحديث المساطر الإدارية",c:["Gouvernance numérique","Transformation digitale","Dématérialisation","GED","Signature électronique","Portails administratifs"]},
+ {code:"F17",axe:"D",j:1,fr:"Communication numérique et gestion de contenu",ar:"التواصل الرقمي وتدبير المحتوى",c:["Écosystème digital","Plan de communication","Rédaction web","IA appliquée aux contenus","Réseaux sociaux","Communication de crise"]},
+ {code:"F18",axe:"B",j:1,fr:"Bons de commande et procédures opérationnelles",ar:"سندات الطلب والمساطر العملية",c:["Bon de commande","Mentions obligatoires","Prix et quantités","Dématérialisation","ERP","Signature électronique"]},
+ {code:"F19",axe:"D",j:1,fr:"Rôle de l'élu et représentation institutionnelle",ar:"دور المنتخب والتمثيلية المؤسساتية",c:["Rôle représentatif","Missions et responsabilités","Légitimité et éthique","Prise de parole","Défense des intérêts collectifs","Réseau institutionnel"]},
+ {code:"F20",axe:"A",j:1,fr:"Création des entreprises",ar:"إحداث المقاولات",c:["Formes juridiques","Choix du statut","Dossier de création","Immatriculation","Obligations fiscales","Dispositifs d'appui"]}
+];
+// Formateurs officiels rattachés à chaque formation (n=nom, q=qualification, e=expérience)
+const FORMATEURS = {
+ F01:[{n:"Oufkir Oufkir",q:"Master Bac+5",e:"—"}],
+ F02:[{n:"Sabir Rachid",q:"Ingénieur",e:"15 ans"}],
+ F03:[{n:"Khalil Bentimzel",q:"Docteur",e:"10 ans"}],
+ F04:[{n:"Saiid Bribch",q:"Docteur",e:"10 ans"},{n:"Lhoussin Oufkir",q:"Master Bac+5",e:"10 ans"},{n:"Omar Melouki",q:"Ingénieur cadre",e:"10 ans"}],
+ F05:[{n:"Abdellah Lamzoud",q:"Master Bac+5 / Aspects juridiques",e:"10 ans"}],
+ F06:[{n:"Lhoussin Oufkir",q:"Master Bac+5",e:"10 ans"}],
+ F07:[{n:"Melkaoui Aomar",q:"Ingénieur en chef",e:"20 ans"}],
+ F08:[{n:"Khalil Bentimzel",q:"Docteur",e:"10 ans"}],
+ F09:[{n:"Melkaoui Aomar",q:"Ingénieur en chef",e:"20 ans"},{n:"Saiid Bribch",q:"Docteur",e:"10 ans"},{n:"Lhoussin Oufkir",q:"Master Bac+5",e:"10 ans"},{n:"Omar Melouki",q:"Ingénieur cadre",e:"10 ans"}],
+ F10:[{n:"Sabir Rachid",q:"Ingénieur",e:"10 ans"},{n:"Fatima Zahra Lghadir",q:"Ingénieure",e:"10 ans"}],
+ F11:[{n:"Badiaa Baddag",q:"Docteure",e:"20 ans"}],
+ F12:[{n:"Sabir Rachid",q:"Ingénieur",e:"15 ans"},{n:"Fatima Zahra Lghadir",q:"Ingénieure",e:"10 ans"}],
+ F13:[{n:"Saiid Bribch",q:"Docteur",e:"10 ans"}],
+ F14:[{n:"Lhbib Naiimi",q:"Docteur",e:"5 ans"}],
+ F15:[{n:"Benaiaich Mohamed",q:"Master Bac+5",e:"15 ans"}],
+ F16:[{n:"Badiaa Baddag",q:"Docteure",e:"20 ans"},{n:"Saiid El Boulmani",q:"Docteur chercheur",e:"10 ans"}],
+ F17:[{n:"Melkaoui Aomar",q:"Ingénieur en chef",e:"20 ans"}],
+ F18:[{n:"Khalil Bentimzel",q:"Docteur",e:"10 ans"}],
+ F19:[{n:"Saiid El Boulmani",q:"Docteur chercheur",e:"10 ans"}],
+ F20:[{n:"Saiid Bribch",q:"Docteur",e:"15 ans"}]
+};
+// Coordination / encadrement général du programme
+const COORDINATEUR = {n:"Abdellah Lamzoud",q:"Master Bac+5 — Gérant du cabinet / Assistant-formateur",e:"10 ans"};
+// Construit la liste éditable des formateurs (agrégée par nom) à partir du référentiel
+function buildFormateursSeed(){
+  const agg={};
+  Object.keys(FORMATEURS).forEach(code=>FORMATEURS[code].forEach(x=>{
+    if(!agg[x.n]) agg[x.n]={id:'',nom:x.n,q:x.q,e:x.e,codes:[],tel:'',email:''};
+    agg[x.n].codes.push(code);
+    if((!agg[x.n].e||agg[x.n].e==='—')&&x.e&&x.e!=='—') agg[x.n].e=x.e;
+  }));
+  const list=Object.values(agg); list.forEach((f,i)=>f.id='FR'+String(i+1).padStart(2,'0'));
+  return list;
+}
+// Lecture : privilégie la base éditable DB.formateurs, sinon le référentiel figé
+function trainersOf(code){
+  if(typeof DB!=='undefined'&&DB&&DB.formateurs) return DB.formateurs.filter(f=>(f.codes||[]).includes(code)).map(f=>({n:f.nom,q:f.q,e:f.e}));
+  return FORMATEURS[code]||[];
+}
+function primaryTrainer(code){ const a=trainersOf(code); return a&&a[0]?a[0].n:"—"; }
+
+/* ================= i18n ================= */
+const I18N = {
+  fr:{
+    appName:"Melkaoui Académie", role:"Rôle", name:"Nom", username:"Identifiant", password:"Mot de passe", login:"Se connecter", logout:"Quitter",
+    r_admin:"Administrateur général", r_resp:"Responsable de formation", r_form:"Formateur", r_part:"Participant", r_inst:"Responsable institutionnel",
+    demoHint:"Prototype de démonstration — données locales (LocalStorage).",
+    m_dash:"Tableau de bord", m_cat:"Formations", m_sess:"Sessions", m_part:"Participants", m_cal:"Calendrier",
+    m_course:"Cours interactifs", m_lib:"Bibliothèque", m_quiz:"Quiz & exercices", m_ai:"Assistant IA", m_prompt:"Prompt Studio",
+    m_form:"Formateurs", fQualif:"Statut / Qualification", fExp:"Expérience", fAssures:"Formations assurées", coordinator:"Coordination du programme",
+    addFormateur:"Ajouter un formateur", fName:"Nom & Prénom", edit:"Modifier", del:"Supprimer", confirmDel:"Confirmer la suppression ?",
+    beneficiary:"Bénéficiaire", allEnrolled:"Tous les inscrits (de cette formation)", certDone:"certificat(s) généré(s)", certHint:"Choisissez une formation puis un bénéficiaire — ou « Tous les inscrits » pour générer en lot.",
+    addFile:"Ajouter un fichier", files:"fichier(s)", noFiles:"Aucun fichier dans ce dossier. Ajoutez-en un.", open:"Ouvrir", folder:"Dossier", file:"Fichier", title:"Titre", optional:"(facultatif)",
+    libHint:"Formats : PDF, audio, vidéo, image, Word, PowerPoint. Stocké localement dans votre navigateur.", libErr:"Erreur de stockage",
+    courseMedia:"Médias de la formation (bibliothèque)", noCourseMedia:"Aucun audio ou vidéo dans le dossier de cette formation. Ajoutez-en dans la Bibliothèque :",
+    m_users:"Utilisateurs & comptes", addUser:"Ajouter un compte", active:"Actif", inactive:"Désactivé", resetPw:"Réinitialiser le mot de passe",
+    pwKeep:"(laisser vide pour conserver)", userExists:"Cet identifiant existe déjà.", newPwFor:"Nouveau mot de passe pour", pwChanged:"Mot de passe modifié.",
+    noSelfDel:"Vous ne pouvez pas supprimer votre propre compte.", lastAdmin:"Impossible de supprimer le dernier administrateur.",
+    fillLogin:"Saisissez votre identifiant et votre mot de passe.", badLogin:"Identifiant ou mot de passe incorrect.", accDisabled:"Compte désactivé. Contactez l'administrateur.",
+    userHint:"Comptes de connexion (identifiant + mot de passe). Par défaut : admin/admin, responsable/resp, formateur/form, participant/part, institution/inst. Modifiez-les.",
+    myPassword:"Changer mon mot de passe",
+    m_att:"Présences", m_sat:"Satisfaction", m_cert:"Certificats", m_rep:"Rapports", m_doc:"Documents", m_set:"Paramètres",
+    sec_learn:"Espace pédagogique", sec_manage:"Gestion", sec_pilot:"Pilotage", sec_ia:"Intelligence artificielle",
+    kFormations:"Formations", kSessions:"Sessions programmées", kBenef:"Bénéficiaires", kFormateurs:"Formateurs",
+    kJours:"Jours réalisés", kPresence:"Taux de présence", kReussite:"Taux de réussite", kSatis:"Satisfaction",
+    chPartForm:"Participants par formation", chPartVille:"Participants par ville", chAxe:"Formations par axe",
+    chReussite:"Résultats aux quiz", chEvol:"Évolution mensuelle", chSat:"Satisfaction moyenne",
+    search:"Rechercher…", allAxes:"Tous les axes", duration:"Durée", days:"j", axis:"Axe", lang:"Langue", view:"Ouvrir",
+    inProgress:"formations en cours", done:"terminées", of:"sur",
+    addSession:"Nouvelle session", formation:"Formation", ville:"Ville", start:"Début", end:"Fin", trainer:"Formateur",
+    capacity:"Capacité", status:"Statut", actions:"Actions", enrolled:"inscrits", save:"Enregistrer", cancel:"Annuler",
+    st_brouillon:"Brouillon", st_planifiee:"Planifiée", st_ouvertes:"Inscriptions ouvertes", st_complete:"Complète",
+    st_encours:"En cours", st_terminee:"Terminée", st_annulee:"Annulée", st_reportee:"Reportée",
+    addPart:"Ajouter un participant", firstName:"Prénom", lastName:"Nom", org:"Entreprise", fonction:"Fonction",
+    category:"Catégorie", phone:"Téléphone", email:"E-mail",
+    chooseCourse:"Choisissez une formation à suivre :", lessons:"Leçons", keyPoints:"Points clés", caseStudy:"Étude de cas",
+    playerFR:"Lecteur audio — Français", playerAR:"المشغل الصوتي — العربية", speed:"Vitesse", voice:"Voix",
+    prev:"Précédent", next:"Suivant", markDone:"Marquer terminé", progress:"Progression",
+    startQuiz:"Lancer le quiz", submitQuiz:"Corriger", quizScore:"Votre score", retry:"Recommencer", passed:"Réussi", failed:"Non validé",
+    genCert:"Générer le certificat", certOf:"Certificat de", download:"Télécharger (imprimer/PDF)",
+    certTitle:"Certificat de réussite", awardedTo:"décerné à", forCompleting:"pour avoir suivi avec succès la formation",
+    certDur:"Durée", certDate:"Date", certNo:"N°", director:"Le Directeur", signature:"Signature & cachet",
+    noResults:"Aucun résultat.", noSessions:"Aucune session. Créez-en une.", noParts:"Aucun participant.",
+    noCerts:"Aucun certificat pour le moment.", noSat:"Aucune évaluation enregistrée.",
+    satTitle:"Évaluation à chaud", satContent:"Qualité du contenu", satTrainer:"Qualité du formateur",
+    satOrg:"Organisation", satUtil:"Utilité pratique", comment:"Commentaire", submit:"Envoyer", satAvg:"Satisfaction moyenne",
+    recommend:"Indice de recommandation", strong:"Points forts", improve:"À améliorer",
+    reports:"Rapports du programme", repForm:"Par formation", repVille:"Par ville", repGlobal:"Rapport global (42 jours)",
+    export:"Exporter", print:"Imprimer",
+    aiPlace:"Posez une question sur une formation…", aiSend:"Envoyer", aiIntro:"Bonjour ! Je suis l'assistant pédagogique. Je réponds uniquement à partir des contenus validés des 20 formations. Posez-moi une question.",
+    aiNoDoc:"⚠️ Cette information ne figure pas dans les documents validés de la plateforme. Je ne peux pas y répondre de façon fiable.",
+    aiSource:"Source", promptStudioT:"Générateur de prompts", pRole:"Rôle", pContext:"Contexte", pObjective:"Objectif",
+    pAudience:"Public", pFormat:"Format", pTone:"Ton", pLength:"Longueur", generate:"Générer le prompt", copy:"Copier", result:"Résultat",
+    dataMgmt:"Base de données Excel", exportXlsx:"Télécharger la base de données (Excel)", importXlsx:"Importer un classeur Excel", dlExcel:"Télécharger la base Excel",
+    importOk:"Base de données importée avec succès.", dataHint:"Exporte toute la base (formateurs, bénéficiaires, sessions, présences, résultats, certificats…) vers un classeur .xlsx, ou recharge l'application depuis un classeur modifié.",
+    settings:"Paramètres", uiLang:"Langue de l'interface", resetData:"Réinitialiser les données de démonstration",
+    resetConfirm:"Réinitialiser toutes les données locales ?", theme:"Programme",
+    total42:"42 jours de formation · 20 formations · 7 villes",
+    att_present:"Présent", att_absent:"Absent", att_retard:"Retard", attendance:"Feuille de présence", attRate:"Taux de présence",
+    pickSession:"Sélectionnez une session", welcome:"Bienvenue", myPath:"Mon parcours", overview:"Vue d'ensemble",
+    conditions:"Conditions remplies", genFor:"Générer pour", allFilled:"Toutes les données des 20 formations sont chargées."
+  },
+  ar:{
+    appName:"أكاديمية ملقاوي", role:"الصفة", name:"الاسم", username:"اسم المستخدم", password:"كلمة المرور", login:"تسجيل الدخول", logout:"خروج",
+    r_admin:"المدير العام", r_resp:"مسؤول التكوين", r_form:"مكوّن", r_part:"مستفيد", r_inst:"مسؤول مؤسساتي",
+    demoHint:"نموذج تجريبي — بيانات محلية (LocalStorage).",
+    m_dash:"لوحة القيادة", m_cat:"التكوينات", m_sess:"الحصص", m_part:"المستفيدون", m_cal:"الأجندة",
+    m_course:"الدروس التفاعلية", m_lib:"المكتبة", m_quiz:"الاختبارات", m_ai:"المساعد الذكي", m_prompt:"استوديو المطالبات",
+    m_form:"المكوّنون", fQualif:"الصفة / المؤهل", fExp:"الخبرة", fAssures:"التكوينات المؤطَّرة", coordinator:"تنسيق البرنامج",
+    addFormateur:"إضافة مكوّن", fName:"الاسم الكامل", edit:"تعديل", del:"حذف", confirmDel:"تأكيد الحذف؟",
+    beneficiary:"المستفيد", allEnrolled:"كل المسجّلين (في هذا التكوين)", certDone:"شهادة/شهادات مُوَلَّدة", certHint:"اختر تكوينا ثم مستفيدا — أو «كل المسجّلين» للتوليد بالجملة.",
+    addFile:"إضافة ملف", files:"ملف/ملفات", noFiles:"لا توجد ملفات في هذا المجلد. أضف ملفا.", open:"فتح", folder:"المجلد", file:"الملف", title:"العنوان", optional:"(اختياري)",
+    libHint:"الصيغ: PDF، صوت، فيديو، صورة، Word، PowerPoint. يُخزَّن محليا في متصفحك.", libErr:"خطأ في التخزين",
+    courseMedia:"وسائط التكوين (من المكتبة)", noCourseMedia:"لا يوجد صوت أو فيديو في مجلد هذا التكوين. أضف ملفات في المكتبة:",
+    m_users:"المستخدمون والحسابات", addUser:"إضافة حساب", active:"مُفعَّل", inactive:"مُعطَّل", resetPw:"إعادة تعيين كلمة المرور",
+    pwKeep:"(اتركه فارغا للإبقاء)", userExists:"اسم المستخدم موجود مسبقا.", newPwFor:"كلمة مرور جديدة لـ", pwChanged:"تم تغيير كلمة المرور.",
+    noSelfDel:"لا يمكنك حذف حسابك الخاص.", lastAdmin:"لا يمكن حذف آخر مدير.",
+    fillLogin:"أدخل اسم المستخدم وكلمة المرور.", badLogin:"اسم المستخدم أو كلمة المرور غير صحيحة.", accDisabled:"الحساب مُعطَّل. اتصل بالمدير.",
+    userHint:"حسابات الدخول (اسم المستخدم + كلمة المرور). افتراضيا: admin/admin وغيرها. يُنصح بتغييرها.",
+    myPassword:"تغيير كلمة المرور",
+    m_att:"الحضور", m_sat:"الرضا", m_cert:"الشهادات", m_rep:"التقارير", m_doc:"الوثائق", m_set:"الإعدادات",
+    sec_learn:"الفضاء البيداغوجي", sec_manage:"التدبير", sec_pilot:"القيادة", sec_ia:"الذكاء الاصطناعي",
+    kFormations:"التكوينات", kSessions:"الحصص المبرمجة", kBenef:"المستفيدون", kFormateurs:"المكوّنون",
+    kJours:"الأيام المنجزة", kPresence:"نسبة الحضور", kReussite:"نسبة النجاح", kSatis:"الرضا",
+    chPartForm:"المستفيدون حسب التكوين", chPartVille:"المستفيدون حسب المدينة", chAxe:"التكوينات حسب المحور",
+    chReussite:"نتائج الاختبارات", chEvol:"التطور الشهري", chSat:"متوسط الرضا",
+    search:"بحث…", allAxes:"كل المحاور", duration:"المدة", days:"ي", axis:"المحور", lang:"اللغة", view:"فتح",
+    inProgress:"تكوينات جارية", done:"منتهية", of:"من",
+    addSession:"حصة جديدة", formation:"التكوين", ville:"المدينة", start:"البداية", end:"النهاية", trainer:"المكوّن",
+    capacity:"الطاقة", status:"الحالة", actions:"إجراءات", enrolled:"مسجّل", save:"حفظ", cancel:"إلغاء",
+    st_brouillon:"مسودة", st_planifiee:"مبرمجة", st_ouvertes:"التسجيل مفتوح", st_complete:"مكتملة",
+    st_encours:"جارية", st_terminee:"منتهية", st_annulee:"ملغاة", st_reportee:"مؤجلة",
+    addPart:"إضافة مستفيد", firstName:"الاسم الشخصي", lastName:"الاسم العائلي", org:"المقاولة", fonction:"الوظيفة",
+    category:"الفئة", phone:"الهاتف", email:"البريد الإلكتروني",
+    chooseCourse:"اختر تكوينا لمتابعته:", lessons:"الدروس", keyPoints:"النقاط الأساسية", caseStudy:"دراسة حالة",
+    playerFR:"المشغل الصوتي — الفرنسية", playerAR:"المشغل الصوتي — العربية", speed:"السرعة", voice:"الصوت",
+    prev:"السابق", next:"التالي", markDone:"إنهاء الدرس", progress:"التقدم",
+    startQuiz:"بدء الاختبار", submitQuiz:"تصحيح", quizScore:"نتيجتك", retry:"إعادة", passed:"ناجح", failed:"غير مقبول",
+    genCert:"توليد الشهادة", certOf:"شهادة", download:"تحميل (طباعة/PDF)",
+    certTitle:"شهادة نجاح", awardedTo:"تُمنح إلى", forCompleting:"لإتمامه بنجاح تكوين",
+    certDur:"المدة", certDate:"التاريخ", certNo:"رقم", director:"المدير", signature:"التوقيع والخاتم",
+    noResults:"لا توجد نتائج.", noSessions:"لا توجد حصص. أنشئ واحدة.", noParts:"لا يوجد مستفيدون.",
+    noCerts:"لا توجد شهادات بعد.", noSat:"لا يوجد تقييم مسجّل.",
+    satTitle:"التقييم الفوري", satContent:"جودة المحتوى", satTrainer:"جودة المكوّن",
+    satOrg:"التنظيم", satUtil:"الفائدة العملية", comment:"ملاحظة", submit:"إرسال", satAvg:"متوسط الرضا",
+    recommend:"مؤشر التوصية", strong:"نقاط القوة", improve:"نقاط التحسين",
+    reports:"تقارير البرنامج", repForm:"حسب التكوين", repVille:"حسب المدينة", repGlobal:"تقرير شامل (42 يوما)",
+    export:"تصدير", print:"طباعة",
+    aiPlace:"اطرح سؤالا حول تكوين…", aiSend:"إرسال", aiIntro:"مرحبا! أنا المساعد البيداغوجي. أجيب فقط انطلاقا من المحتويات المعتمدة للتكوينات العشرين. اطرح سؤالك.",
+    aiNoDoc:"⚠️ هذه المعلومة غير واردة في الوثائق المعتمدة للمنصة. لا يمكنني الإجابة بشكل موثوق.",
+    aiSource:"المصدر", promptStudioT:"مولّد المطالبات", pRole:"الدور", pContext:"السياق", pObjective:"الهدف",
+    pAudience:"الجمهور", pFormat:"الصيغة", pTone:"النبرة", pLength:"الطول", generate:"توليد المطالبة", copy:"نسخ", result:"النتيجة",
+    dataMgmt:"قاعدة البيانات Excel", exportXlsx:"تحميل قاعدة البيانات (Excel)", importXlsx:"استيراد ملف Excel", dlExcel:"تحميل قاعدة Excel",
+    importOk:"تم استيراد قاعدة البيانات بنجاح.", dataHint:"صدّر كل القاعدة (المكوّنون، المستفيدون، الحصص، الحضور، النتائج، الشهادات…) إلى ملف xlsx، أو أعد تحميل التطبيق من ملف مُعدَّل.",
+    settings:"الإعدادات", uiLang:"لغة الواجهة", resetData:"إعادة تعيين بيانات العرض",
+    resetConfirm:"إعادة تعيين كل البيانات المحلية؟", theme:"البرنامج",
+    total42:"42 يوم تكوين · 20 تكوينا · 7 مدن",
+    att_present:"حاضر", att_absent:"غائب", att_retard:"متأخر", attendance:"ورقة الحضور", attRate:"نسبة الحضور",
+    pickSession:"اختر حصة", welcome:"مرحبا", myPath:"مساري", overview:"نظرة عامة",
+    conditions:"الشروط المستوفاة", genFor:"توليد لـ", allFilled:"تم تحميل بيانات التكوينات العشرين كاملة."
+  }
+};
+let LANG = localStorage.getItem('ma_lang') || 'fr';
+function t(k){ return (I18N[LANG] && I18N[LANG][k]) || (I18N.fr[k]) || k; }
+
+/* ================= ÉTAT / STORAGE ================= */
+const DB_KEY = 'melkaoui_db_v3';
+// Hachage local des mots de passe (démo — un déploiement réel utiliserait bcrypt côté serveur)
+function hashPwd(p){ let h=5381; const s='ccis2026:'+(p||''); for(let i=0;i<s.length;i++) h=((h*33)^s.charCodeAt(i))>>>0; return 'h'+h.toString(16); }
+function seedUsers(){ return [
+  {id:'u1', nom:'Aomar Melkaoui', username:'admin', pw:hashPwd('admin'), role:'admin', actif:true},
+  {id:'u2', nom:'Responsable Formation', username:'responsable', pw:hashPwd('resp'), role:'responsable', actif:true},
+  {id:'u3', nom:'Formateur', username:'formateur', pw:hashPwd('form'), role:'formateur', actif:true},
+  {id:'u4', nom:'Participant', username:'participant', pw:hashPwd('part'), role:'participant', actif:true},
+  {id:'u5', nom:'Responsable Institutionnel', username:'institution', pw:hashPwd('inst'), role:'institution', actif:true}
+]; }
+let DB;
+function seed(){
+  const trainers = ["Dr. Karim Benali","Mme Salma Idrissi","M. Youssef Amrani","Mme Nadia El Fassi","M. Hamid Ouazzani"];
+  const catsFR = CATEGORIES.fr;
+  const firstNames=["Aomar","Fatima","Youssef","Salma","Hamza","Khadija","Mehdi","Imane","Rachid","Souad","Anas","Loubna","Karim","Nadia","Omar"];
+  const lastNames=["Melkaoui","Idrissi","Amrani","El Fassi","Bennani","Ouazzani","Tazi","Chaoui","Berrada","Alaoui"];
+  const participants = [];
+  for(let i=0;i<48;i++){
+    participants.push({
+      id:'p'+(i+1), prenom:firstNames[i%firstNames.length], nom:lastNames[i%lastNames.length],
+      org:["CCIS Marrakech-Safi","SARL Atlas","Coop Argan","TPE Medina","Auto-entrepreneur"][i%5],
+      fonction:["Cadre","Gérant","Agent","Élu","Technicien"][i%5],
+      cat:catsFR[i%catsFR.length], ville:VILLES[i%VILLES.length],
+      tel:"06"+String(10000000+i*137).slice(0,8), email:firstNames[i%firstNames.length].toLowerCase()+i+"@exemple.ma"
+    });
+  }
+  // sessions : une par formation, statuts variés
+  const statuses=["terminee","terminee","en_cours","ouvertes","planifiee","complete","terminee"];
+  let d0 = new Date(2026,8,1); // 1 sept 2026
+  const sessions = FORMATIONS.map((f,i)=>{
+    const start=new Date(d0.getTime()+i*4*86400000);
+    const end=new Date(start.getTime()+(f.j-1)*86400000);
+    const enr=[];
+    const n=6+ (i%9);
+    for(let k=0;k<n;k++) enr.push(participants[(i*3+k)%participants.length].id);
+    return {
+      id:'s'+(i+1), fcode:f.code, ville:VILLES[i%VILLES.length], salle:"Salle "+(1+i%4),
+      debut:start.toISOString().slice(0,10), fin:end.toISOString().slice(0,10),
+      formateur:primaryTrainer(f.code)!=="—"?primaryTrainer(f.code):trainers[i%trainers.length], capacite:20, statut:statuses[i%statuses.length],
+      inscrits:enr
+    };
+  });
+  // résultats quiz & satisfaction pour sessions terminées
+  const quizResults=[]; const satis=[]; const attendance=[];
+  sessions.forEach(s=>{
+    if(s.statut==='terminee'||s.statut==='en_cours'){
+      s.inscrits.forEach((pid,idx)=>{
+        const score = 55 + ((idx*17+s.id.length*9)%46); // 55-100
+        quizResults.push({pid, fcode:s.fcode, sid:s.id, score});
+        attendance.push({pid, sid:s.id, statut: idx%9===0?'absent':(idx%7===0?'retard':'present')});
+        if(idx%2===0) satis.push({sid:s.id, fcode:s.fcode,
+          contenu:3+ (idx%3), formateur:4+(idx%2), org:3+(idx%3), util:4+(idx%2),
+          reco: 7+(idx%4), comment:""});
+      });
+    }
+  });
+  return {users:seedUsers(), formateurs:buildFormateursSeed(), participants, sessions, quizResults, satis, attendance, certificates:[], library:[], progress:{}, satisfactionDone:{}};
+}
+function load(){
+  try{ DB = JSON.parse(localStorage.getItem(DB_KEY)); }catch(e){ DB=null; }
+  if(!DB || !DB.sessions){ DB = seed(); save(); }
+  if(!DB.formateurs || !DB.formateurs.length){ DB.formateurs = buildFormateursSeed(); save(); }
+  if(!DB.library){ DB.library = []; save(); }
+  if(!DB.users || !DB.users.length){ DB.users = seedUsers(); save(); }
+}
+function save(){ localStorage.setItem(DB_KEY, JSON.stringify(DB)); }
+function resetDB(){ if(confirm(t('resetConfirm'))){ DB=seed(); save(); render(); } }
+
+let USER = null;
+
+/* ================= LANGUE ================= */
+function setLang(l){
+  LANG=l; localStorage.setItem('ma_lang',l);
+  document.documentElement.lang=l;
+  document.documentElement.dir = l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i')); });
+  ['lgFR','tFR'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',l==='fr');});
+  ['lgAR','tAR'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',l==='ar');});
+  if(USER){ buildNav(); render(); }
+}
+
+/* ================= THÈME CLAIR / SOMBRE ================= */
+function setTheme(mode){
+  if(mode==='dark') document.documentElement.setAttribute('data-theme','dark');
+  else document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('ma_theme', mode||'light');
+  const icon = mode==='dark' ? '☀️' : '🌙';
+  ['themeBtn','themeBtnL'].forEach(id=>{ const b=document.getElementById(id); if(b) b.textContent=icon; });
+}
+function toggleTheme(){
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  setTheme(dark ? 'light' : 'dark');
+}
+
+/* ================= AUTH ================= */
+const ROLE_LABEL = {admin:'r_admin',responsable:'r_resp',formateur:'r_form',participant:'r_part',institution:'r_inst'};
+function doLogin(){
+  const u=(document.getElementById('loginUser').value||'').trim();
+  const p=document.getElementById('loginPass').value||'';
+  const err=document.getElementById('loginErr');
+  const show=m=>{ err.textContent=m; err.style.display='block'; };
+  if(!u||!p){ show(t('fillLogin')); return; }
+  const acc=(DB.users||[]).find(x=>x.username.toLowerCase()===u.toLowerCase());
+  if(!acc || acc.pw!==hashPwd(p)){ show(t('badLogin')); return; }
+  if(acc.actif===false){ show(t('accDisabled')); return; }
+  err.style.display='none';
+  USER={id:acc.id, role:acc.role, name:acc.nom, username:acc.username};
+  document.getElementById('loginPass').value='';
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('whoName').textContent=acc.nom;
+  document.getElementById('whoRole').textContent=t(ROLE_LABEL[acc.role]);
+  document.getElementById('whoAv').textContent=(acc.nom||'?')[0].toUpperCase();
+  buildNav(); go('dash');
+}
+function logout(){ USER=null; document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); const p=document.getElementById('loginPass'); if(p)p.value=''; }
+
+/* ================= NAVIGATION ================= */
+const MENU = [
+  {sec:'sec_pilot'},
+  {id:'dash',i:'m_dash',ic:'📊',roles:'*'},
+  {id:'reports',i:'m_rep',ic:'📈',roles:['admin','responsable','institution']},
+  {sec:'sec_learn'},
+  {id:'catalogue',i:'m_cat',ic:'📚',roles:'*'},
+  {id:'course',i:'m_course',ic:'🎓',roles:'*'},
+  {id:'quiz',i:'m_quiz',ic:'✅',roles:['participant','formateur','admin','responsable']},
+  {id:'library',i:'m_lib',ic:'🗂️',roles:'*'},
+  {id:'cert',i:'m_cert',ic:'🏅',roles:'*'},
+  {sec:'sec_manage'},
+  {id:'sessions',i:'m_sess',ic:'📅',roles:['admin','responsable','formateur']},
+  {id:'formateurs',i:'m_form',ic:'👨‍🏫',roles:['admin','responsable','institution']},
+  {id:'participants',i:'m_part',ic:'👥',roles:['admin','responsable']},
+  {id:'attendance',i:'m_att',ic:'🖊️',roles:['admin','responsable','formateur']},
+  {id:'satisfaction',i:'m_sat',ic:'⭐',roles:'*'},
+  {sec:'sec_ia'},
+  {id:'assistant',i:'m_ai',ic:'🤖',roles:'*'},
+  {id:'prompt',i:'m_prompt',ic:'✨',roles:['admin','responsable','formateur']},
+  {sec:''},
+  {id:'users',i:'m_users',ic:'🔐',roles:['admin']},
+  {id:'settings',i:'m_set',ic:'⚙️',roles:'*'}
+];
+let CURRENT='dash';
+function allowed(m){ return m.roles==='*' || m.roles.includes(USER.role); }
+function buildNav(){
+  const nav=document.getElementById('nav'); nav.innerHTML='';
+  MENU.forEach(m=>{
+    if(m.sec!==undefined){ if(m.sec){ const s=document.createElement('div'); s.className='sep'; s.textContent=t(m.sec); nav.appendChild(s);} return; }
+    if(!allowed(m)) return;
+    const a=document.createElement('a'); a.href='#'; a.dataset.id=m.id;
+    a.innerHTML=`<span class="ic">${m.ic}</span><span>${t(m.i)}</span>`;
+    a.classList.toggle('active',m.id===CURRENT);
+    a.onclick=(e)=>{e.preventDefault(); go(m.id); document.getElementById('sidebar').classList.remove('open');};
+    nav.appendChild(a);
+  });
+}
+function go(id){ CURRENT=id; buildNav(); render(); }
+
+/* ================= HELPERS ================= */
+function fmt(n,d=0){ return Number(n).toLocaleString(LANG==='ar'?'ar-MA':'fr-FR',{maximumFractionDigits:d}); }
+function ftitle(f){ return LANG==='ar'? f.ar : f.fr; }
+function fById(code){ return FORMATIONS.find(f=>f.code===code); }
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+function statusBadge(st){
+  const cls = {terminee:'ok',en_cours:'info',ouvertes:'warn',planifiee:'info',complete:'ok',annulee:'bad',reportee:'warn',brouillon:'warn'}[st]||'info';
+  return `<span class="badge ${cls}">${t('st_'+st.replace('_',''))||st}</span>`;
+}
+// stats
+function stats(){
+  const s=DB.sessions;
+  const benef=new Set(); s.forEach(x=>x.inscrits.forEach(p=>benef.add(p)));
+  const formateurs=new Set(s.map(x=>x.formateur));
+  const jours = s.filter(x=>x.statut==='terminee').reduce((a,x)=>a+fById(x.fcode).j,0);
+  const att=DB.attendance; const pres=att.filter(a=>a.statut!=='absent').length;
+  const presRate= att.length? Math.round(pres/att.length*100):0;
+  const qr=DB.quizResults; const ok=qr.filter(q=>q.score>=60).length;
+  const reussite= qr.length? Math.round(ok/qr.length*100):0;
+  const sat=DB.satis; let sm=0; if(sat.length){ sm=sat.reduce((a,x)=>a+(x.contenu+x.formateur+x.org+x.util)/4,0)/sat.length; }
+  const satPct= sat.length? Math.round(sm/5*100):0;
+  return {nbForm:FORMATIONS.length, nbSess:s.length, benef:benef.size, formateurs:formateurs.size,
+    jours, presRate, reussite, satPct,
+    enCours:s.filter(x=>x.statut==='en_cours').length, termine:s.filter(x=>x.statut==='terminee').length};
+}
+let charts=[];
+function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[]; }
+
+/* ================= RENDER ROUTER ================= */
+function render(){
+  destroyCharts();
+  document.getElementById('pageTitle').textContent = t((MENU.find(m=>m.id===CURRENT)||{}).i||'m_dash');
+  const v=document.getElementById('view');
+  ({dash:vDash,catalogue:vCatalogue,course:vCourse,quiz:vQuiz,library:vLibrary,cert:vCert,
+    sessions:vSessions,formateurs:vFormateurs,participants:vParticipants,attendance:vAttendance,satisfaction:vSatisfaction,
+    assistant:vAssistant,prompt:vPrompt,reports:vReports,users:vUsers,settings:vSettings}[CURRENT]||vDash)(v);
+}
+
+/* -------- DASHBOARD -------- */
+function vDash(v){
+  const s=stats();
+  const kpi=(v,l,ic)=>`<div class="kpi"><span class="ic">${ic}</span><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  v.innerHTML=`
+   <div class="kpi-grid">
+     ${kpi(s.nbForm,t('kFormations'),'📚')}
+     ${kpi(s.nbSess,t('kSessions'),'📅')}
+     ${kpi(fmt(s.benef),t('kBenef'),'👥')}
+     ${kpi(s.formateurs,t('kFormateurs'),'👨‍🏫')}
+     ${kpi(s.jours+' / 42',t('kJours'),'🗓️')}
+     ${kpi(s.presRate+'%',t('kPresence'),'✅')}
+     ${kpi(s.reussite+'%',t('kReussite'),'🎯')}
+     ${kpi(s.satPct+'%',t('kSatis'),'⭐')}
+   </div>
+   <div class="panel" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+     <div><b style="font-size:22px;color:var(--brand)">${s.enCours}</b> <span style="color:var(--muted)">${t('inProgress')}</span></div>
+     <div><b style="font-size:22px;color:var(--ok)">${s.termine}</b> <span style="color:var(--muted)">${t('done')}</span></div>
+     <div style="color:var(--muted)">·</div>
+     <div style="color:var(--muted)">${t('total42')}</div>
+   </div>
+   <div class="charts">
+     <div class="chart-box"><h4>${t('chPartForm')}</h4><canvas id="c1"></canvas></div>
+     <div class="chart-box"><h4>${t('chPartVille')}</h4><canvas id="c2"></canvas></div>
+     <div class="chart-box"><h4>${t('chAxe')}</h4><canvas id="c3"></canvas></div>
+     <div class="chart-box"><h4>${t('chEvol')}</h4><canvas id="c4"></canvas></div>
+   </div>`;
+  // data
+  const perForm = FORMATIONS.map(f=>{ let n=0; DB.sessions.filter(s=>s.fcode===f.code).forEach(s=>n+=s.inscrits.length); return n; });
+  const perVille = VILLES.map(vl=>{ let n=0; DB.sessions.filter(s=>s.ville===vl).forEach(s=>n+=s.inscrits.length); return n; });
+  const perAxe = Object.keys(AXES).map(k=>FORMATIONS.filter(f=>f.axe===k).length);
+  const months=['Sep','Oct','Nov','Déc']; const monthsAr=['شتنبر','أكتوبر','نونبر','دجنبر'];
+  const perMonth=[0,0,0,0]; DB.sessions.forEach(s=>{ const m=new Date(s.debut).getMonth()-8; if(m>=0&&m<4) perMonth[m]+=s.inscrits.length; });
+  const C='#14919b', C2='#e0a458', pal=['#0d5c63','#14919b','#e0a458','#5b8266','#9d6b53','#4a6fa5','#b3554e'];
+  const opt={responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true}}};
+  charts.push(new Chart(c1,{type:'bar',data:{labels:FORMATIONS.map(f=>f.code),datasets:[{data:perForm,backgroundColor:C}]},options:opt}));
+  charts.push(new Chart(c2,{type:'bar',data:{labels:VILLES.map(v=>v.split(' ')[0]),datasets:[{data:perVille,backgroundColor:C2}]},options:{...opt,indexAxis:'y'}}));
+  charts.push(new Chart(c3,{type:'doughnut',data:{labels:Object.keys(AXES).map(k=>'Axe '+k),datasets:[{data:perAxe,backgroundColor:pal}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}}));
+  charts.push(new Chart(c4,{type:'line',data:{labels:LANG==='ar'?monthsAr:months,datasets:[{data:perMonth,borderColor:C,backgroundColor:'rgba(20,145,155,.15)',fill:true,tension:.3}]},options:opt}));
+}
+
+/* -------- CATALOGUE -------- */
+let catFilter={q:'',axe:'all'};
+function vCatalogue(v){
+  v.innerHTML=`
+   <div class="toolbar">
+     <input class="grow" id="catQ" placeholder="${t('search')}" value="${catFilter.q}">
+   </div>
+   <div class="chips" id="catChips"></div>
+   <div class="fgrid" id="fgrid"></div>`;
+  const chips=v.querySelector('#catChips');
+  const mk=(k,lbl)=>{ const c=el(`<div class="chip ${catFilter.axe===k?'on':''}">${lbl}</div>`); c.onclick=()=>{catFilter.axe=k;vCatalogue(v);}; chips.appendChild(c); };
+  mk('all',t('allAxes'));
+  Object.keys(AXES).forEach(k=>mk(k,'Axe '+k));
+  v.querySelector('#catQ').oninput=e=>{catFilter.q=e.target.value; drawCat();};
+  function drawCat(){
+    const g=v.querySelector('#fgrid'); g.innerHTML='';
+    const list=FORMATIONS.filter(f=>(catFilter.axe==='all'||f.axe===catFilter.axe)
+      && (ftitle(f).toLowerCase().includes(catFilter.q.toLowerCase())||f.code.toLowerCase().includes(catFilter.q.toLowerCase())));
+    if(!list.length){ g.innerHTML=`<div class="empty">${t('noResults')}</div>`; return; }
+    list.forEach(f=>{
+      const card=el(`<div class="fcard">
+        <div class="top"><span class="code">${f.code}</span><span class="badge ${f.axe}">Axe ${f.axe}</span></div>
+        <h4>${ftitle(f)}</h4>
+        <ul>${f.c.slice(0,3).map(x=>`<li>${x}</li>`).join('')}</ul>
+        <div style="font-size:11.5px;color:var(--muted)">👨‍🏫 ${primaryTrainer(f.code)}</div>
+        <div class="meta"><span>⏱️ ${f.j} ${t('days')}</span><span>🌐 FR / ع</span></div>
+        <button class="btn btn-sm" style="margin-top:6px">${t('view')}</button>
+      </div>`);
+      card.querySelector('button').onclick=()=>openFormation(f);
+      g.appendChild(card);
+    });
+  }
+  drawCat();
+}
+function openFormation(f){
+  showModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <span class="badge ${f.axe}">Axe ${f.axe} — ${LANG==='ar'?AXES[f.axe].ar:AXES[f.axe].fr}</span>
+    <h3 style="margin-top:10px">${f.code} · ${ftitle(f)}</h3>
+    <p style="color:var(--muted);margin:6px 0 10px">⏱️ ${f.j} ${t('days')} · 🌐 FR / العربية</p>
+    <div class="panel" style="margin:0 0 14px;padding:12px;background:#f8fafc">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">👨‍🏫 ${t('m_form')}</div>
+      ${trainersOf(f.code).map(x=>`<div style="font-size:13px;margin-bottom:2px"><b>${x.n}</b> <span style="color:var(--muted)">— ${x.q} · ${x.e}</span></div>`).join('')}
+    </div>
+    <h4 style="margin-bottom:8px">${t('keyPoints')}</h4>
+    <ul style="padding-inline-start:20px;line-height:1.9">${f.c.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="gap mt right">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+      <button class="btn btn-sm" onclick="closeModal();CURRENT_COURSE='${f.code}';go('course')">${t('m_course')}</button>
+    </div>`);
+}
+
+/* -------- COURSE (espace pédagogique + audio FR/AR) -------- */
+let CURRENT_COURSE=null, CURRENT_LESSON=0;
+function lessonsFor(f){
+  // dérive des leçons à partir des contenus
+  return f.c.map((titre,i)=>({
+    titre_fr:titre, titre_ar:titre,
+    intro_fr:`Cette leçon aborde « ${titre} » dans le cadre de la formation ${f.fr}. Elle présente les notions clés, les bonnes pratiques et un cas d'application concret adapté au contexte de la CCIS Marrakech-Safi.`,
+    intro_ar:`يتناول هذا الدرس موضوع «${titre}» ضمن تكوين ${f.ar}. ويقدم المفاهيم الأساسية والممارسات الجيدة وحالة تطبيقية ملموسة تناسب سياق غرفة التجارة لجهة مراكش آسفي.`,
+    points:f.c.filter((_,j)=>j!==i).slice(0,3)
+  }));
+}
+function vCourse(v){
+  if(!CURRENT_COURSE){
+    v.innerHTML=`<p style="color:var(--muted);margin-bottom:14px">${t('chooseCourse')}</p><div class="fgrid" id="cg"></div>`;
+    const g=v.querySelector('#cg');
+    FORMATIONS.forEach(f=>{
+      const prog=DB.progress[f.code]||0;
+      const card=el(`<div class="fcard">
+        <div class="top"><span class="code">${f.code}</span><span class="badge ${f.axe}">Axe ${f.axe}</span></div>
+        <h4>${ftitle(f)}</h4>
+        <div class="progress" style="margin-top:6px"><i style="width:${prog}%"></i></div>
+        <div class="meta"><span>${t('progress')}: ${prog}%</span><span>${f.c.length} ${t('lessons')}</span></div>
+        <button class="btn btn-sm">${t('view')}</button></div>`);
+      card.querySelector('button').onclick=()=>{CURRENT_COURSE=f.code;CURRENT_LESSON=0;vCourse(v);};
+      g.appendChild(card);
+    });
+    return;
+  }
+  const f=fById(CURRENT_COURSE); const L=lessonsFor(f); const ls=L[CURRENT_LESSON];
+  const title=LANG==='ar'?ls.titre_ar:ls.titre_fr;
+  const intro=LANG==='ar'?ls.intro_ar:ls.intro_fr;
+  v.innerHTML=`
+   <button class="btn btn-ghost btn-sm" onclick="CURRENT_COURSE=null;vCourse(document.getElementById('view'))">← ${t('m_course')}</button>
+   <h3 style="margin:12px 0 4px">${f.code} · ${ftitle(f)}</h3>
+   <div class="lesson-nav" id="lnav"></div>
+
+   <div class="player">
+     <div class="lbl">🔊 ${t('playerFR')}</div>
+     <div class="ctrls">
+       <button class="big" onclick="speak('fr')">▶</button>
+       <button onclick="pauseSpeech()">⏸</button>
+       <button onclick="stopSpeech()">⏹</button>
+       <span class="tag">${t('speed')}</span>
+       <input type="range" min="0.5" max="1.5" step="0.1" value="1" id="rateFR" style="width:90px">
+       <select id="voiceFR" style="max-width:150px"></select>
+     </div>
+   </div>
+   <div class="player" style="background:linear-gradient(135deg,#7a4b1e,#c98a3a)">
+     <div class="lbl">🔊 ${t('playerAR')}</div>
+     <div class="ctrls">
+       <button class="big" onclick="speak('ar')">▶</button>
+       <button onclick="pauseSpeech()">⏸</button>
+       <button onclick="stopSpeech()">⏹</button>
+       <span class="tag">${t('speed')}</span>
+       <input type="range" min="0.5" max="1.5" step="0.1" value="1" id="rateAR" style="width:90px">
+       <select id="voiceAR" style="max-width:150px"></select>
+     </div>
+   </div>
+
+   <div class="panel">
+     <h3>${title}</h3>
+     <div class="lesson-body">
+       <p id="lessonText">${intro}</p>
+       <h4>${t('keyPoints')}</h4>
+       <ul>${ls.points.map(p=>`<li>${p}</li>`).join('')}</ul>
+       <div class="callout">📌 ${t('caseStudy')} : ${LANG==='ar'? 'حالة تطبيقية من مقاولة بجهة مراكش آسفي.' : 'Cas pratique inspiré d\'une entreprise de la région Marrakech-Safi.'}</div>
+     </div>
+     <div class="gap mt">
+       <button class="btn btn-ghost btn-sm" ${CURRENT_LESSON===0?'disabled':''} onclick="CURRENT_LESSON--;vCourse(document.getElementById('view'))">← ${t('prev')}</button>
+       <button class="btn btn-ghost btn-sm" ${CURRENT_LESSON>=L.length-1?'disabled':''} onclick="CURRENT_LESSON++;markProg();vCourse(document.getElementById('view'))">${t('next')} →</button>
+       <button class="btn btn-sm" onclick="markProg(true)">${t('markDone')}</button>
+       <button class="btn btn-sm" style="background:var(--accent)" onclick="CURRENT_QUIZ='${f.code}';go('quiz')">${t('startQuiz')}</button>
+     </div>
+   </div>
+   <div class="panel"><h3>🎧 ${t('courseMedia')}</h3>${courseMediaHTML(f.code)}</div>`;
+  const ln=v.querySelector('#lnav');
+  L.forEach((l,i)=>{ const b=el(`<button class="${i===CURRENT_LESSON?'on':''}">${i+1}</button>`); b.onclick=()=>{CURRENT_LESSON=i;vCourse(v);}; ln.appendChild(b); });
+  hydrateCourseMedia(v);
+  fillVoices();
+}
+/* Médias (audio/vidéo) de la bibliothèque liés à la formation, joués dans le cours */
+function courseMediaHTML(fcode){
+  const files=(DB.library||[]).filter(x=>x.fcode===fcode && (x.type==='Audio'||x.type==='Vidéo'));
+  if(!files.length) return `<div style="color:var(--muted);font-size:13px">${t('noCourseMedia')} <a href="#" onclick="LIB_FOLDER='${fcode}';go('library');return false">＋ ${t('m_lib')}</a></div>`;
+  return files.map(fl=>{
+    const ic=LIB_ICON[fl.type]||'📎';
+    const attrs=`data-mid="${fl.id}" data-mt="${fl.mime||''}" data-mn="${(fl.title||'').replace(/"/g,'')}"`;
+    const head=`<div style="font-size:13px;font-weight:600;margin:2px 0 5px">${ic} ${fl.title}</div>`;
+    if(fl.type==='Audio') return `<div style="margin-bottom:14px">${head}<audio ${attrs} controls preload="none" style="width:100%"></audio></div>`;
+    return `<div style="margin-bottom:14px">${head}<video ${attrs} controls preload="metadata" playsinline style="width:100%;max-height:52vh;border-radius:10px;background:#000"></video></div>`;
+  }).join('');
+}
+function hydrateCourseMedia(root){
+  if(!root||!root.querySelectorAll) return;
+  root.querySelectorAll('[data-mid]').forEach(elm=>{
+    const id=elm.getAttribute('data-mid');
+    const mime=elm.getAttribute('data-mt')||mimeFromName(elm.getAttribute('data-mn')||'');
+    idbGet(id).then(b=>{ if(!b)return; if((!b.type||b.type==='application/octet-stream')&&mime) b=new Blob([b],{type:mime}); elm.src=URL.createObjectURL(b); }).catch(()=>{});
+  });
+}
+function markProg(force){
+  const f=fById(CURRENT_COURSE); const total=f.c.length;
+  const cur=Math.round((CURRENT_LESSON+ (force?1:0))/total*100);
+  DB.progress[f.code]=Math.max(DB.progress[f.code]||0, Math.min(100,cur)); save();
+}
+/* Web Speech API */
+let voicesReady=false;
+function fillVoices(){
+  const vs=speechSynthesis.getVoices();
+  const fr=vs.filter(v=>/fr/i.test(v.lang)); const ar=vs.filter(v=>/ar/i.test(v.lang));
+  const frSel=document.getElementById('voiceFR'), arSel=document.getElementById('voiceAR');
+  if(frSel){ frSel.innerHTML=(fr.length?fr:vs).map(v=>`<option value="${v.name}">${v.name}</option>`).join(''); }
+  if(arSel){ arSel.innerHTML=(ar.length?ar:[{name:'(voix arabe indisponible)'}]).map(v=>`<option value="${v.name}">${v.name}</option>`).join(''); }
+}
+speechSynthesis.onvoiceschanged=()=>{ voicesReady=true; if(CURRENT==='course') fillVoices(); };
+function speak(lang){
+  stopSpeech();
+  const f=fById(CURRENT_COURSE); const L=lessonsFor(f); const ls=L[CURRENT_LESSON];
+  const txt = lang==='ar'? ls.intro_ar : ls.intro_fr;
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang = lang==='ar'?'ar-SA':'fr-FR';
+  const rate=document.getElementById(lang==='ar'?'rateAR':'rateFR'); u.rate=rate?parseFloat(rate.value):1;
+  const sel=document.getElementById(lang==='ar'?'voiceAR':'voiceFR');
+  const vo=speechSynthesis.getVoices().find(v=>v.name===(sel&&sel.value)); if(vo)u.voice=vo;
+  speechSynthesis.speak(u);
+}
+function pauseSpeech(){ if(speechSynthesis.speaking && !speechSynthesis.paused) speechSynthesis.pause(); else speechSynthesis.resume(); }
+function stopSpeech(){ speechSynthesis.cancel(); }
+
+/* -------- QUIZ -------- */
+let CURRENT_QUIZ=null;
+function quizFor(f){
+  // 4 questions dérivées des contenus
+  const qs=[];
+  qs.push({q:LANG==='ar'?`ما هو المحور الذي ينتمي إليه تكوين «${ftitle(f)}»؟`:`À quel axe appartient la formation « ${ftitle(f)} » ?`,
+    opts:['Axe A','Axe B','Axe C','Axe D'], correct:['A','B','C','D'].indexOf(f.axe)});
+  qs.push({q:LANG==='ar'?`كم تبلغ مدة هذا التكوين؟`:`Quelle est la durée de cette formation ?`,
+    opts:[`${f.j} ${t('days')}`,`${f.j+1} ${t('days')}`,`${Math.max(1,f.j-1)} ${t('days')}`,`${f.j+2} ${t('days')}`], correct:0});
+  qs.push({q:LANG==='ar'?`أي عنصر يشكّل جزءا من محتوى هذا التكوين؟`:`Lequel de ces éléments fait partie du programme ?`,
+    opts:[f.c[0], "Comptabilité analytique avancée", "Robotique industrielle", "Droit maritime"], correct:0});
+  const other = FORMATIONS.find(x=>x.code!==f.code);
+  qs.push({q:LANG==='ar'?`أي موضوع لا يندرج ضمن هذا التكوين؟`:`Quel thème n'est PAS traité dans cette formation ?`,
+    opts:[f.c[1]||f.c[0], f.c[2]||f.c[0], other.c[0], f.c[0]], correct:2});
+  return qs;
+}
+let quizAnswers={};
+function vQuiz(v){
+  if(!CURRENT_QUIZ){
+    v.innerHTML=`<p style="color:var(--muted);margin-bottom:14px">${t('chooseCourse')}</p><div class="fgrid" id="qg"></div>`;
+    const g=v.querySelector('#qg');
+    FORMATIONS.forEach(f=>{
+      const card=el(`<div class="fcard"><div class="top"><span class="code">${f.code}</span><span class="badge ${f.axe}">Axe ${f.axe}</span></div>
+        <h4>${ftitle(f)}</h4><div class="meta"><span>4 questions · QCM</span></div>
+        <button class="btn btn-sm">${t('startQuiz')}</button></div>`);
+      card.querySelector('button').onclick=()=>{CURRENT_QUIZ=f.code;quizAnswers={};vQuiz(v);};
+      g.appendChild(card);
+    });
+    return;
+  }
+  const f=fById(CURRENT_QUIZ); const qs=quizFor(f);
+  v.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="CURRENT_QUIZ=null;vQuiz(document.getElementById('view'))">← ${t('m_quiz')}</button>
+   <h3 style="margin:12px 0">${f.code} · ${ftitle(f)}</h3>
+   <div id="quizWrap"></div>
+   <button class="btn" onclick="submitQuiz()">${t('submitQuiz')}</button>
+   <div id="quizResult" class="mt"></div>`;
+  const w=v.querySelector('#quizWrap');
+  qs.forEach((q,qi)=>{
+    const box=el(`<div class="q"><div class="qt">${qi+1}. ${q.q}</div></div>`);
+    q.opts.forEach((o,oi)=>{
+      const op=el(`<div class="opt" data-q="${qi}" data-o="${oi}">${o}</div>`);
+      op.onclick=()=>{ if(op.parentElement.dataset.locked)return; quizAnswers[qi]=oi;
+        box.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); op.classList.add('sel'); };
+      box.appendChild(op);
+    });
+    w.appendChild(box);
+  });
+}
+function submitQuiz(){
+  const f=fById(CURRENT_QUIZ); const qs=quizFor(f); let good=0;
+  qs.forEach((q,qi)=>{
+    const opts=document.querySelectorAll(`.opt[data-q="${qi}"]`);
+    opts.forEach(o=>{ const oi=+o.dataset.o;
+      if(oi===q.correct)o.classList.add('correct');
+      if(quizAnswers[qi]===oi && oi!==q.correct)o.classList.add('wrong');
+      o.parentElement.dataset.locked=1;
+    });
+    if(quizAnswers[qi]===q.correct)good++;
+  });
+  const score=Math.round(good/qs.length*100); const pass=score>=60;
+  // enregistre
+  DB.quizResults.push({pid:'me',fcode:f.code,sid:'self',score});
+  DB.progress[f.code]=Math.max(DB.progress[f.code]||0, pass?100:DB.progress[f.code]||0); save();
+  document.getElementById('quizResult').innerHTML=
+    `<div class="panel" style="text-align:center">
+      <div style="font-size:34px;font-weight:800;color:${pass?'var(--ok)':'var(--bad)'}">${score}%</div>
+      <div class="badge ${pass?'ok':'bad'}">${pass?t('passed'):t('failed')}</div>
+      <p style="color:var(--muted);margin-top:8px">${t('quizScore')} : ${good}/${qs.length}</p>
+      <div class="gap mt" style="justify-content:center">
+        <button class="btn btn-ghost btn-sm" onclick="quizAnswers={};vQuiz(document.getElementById('view'))">${t('retry')}</button>
+        ${pass?`<button class="btn btn-sm" onclick="issueCert('${f.code}');go('cert')">${t('genCert')}</button>`:''}
+      </div>
+    </div>`;
+}
+
+/* -------- CERTIFICATS -------- */
+function issueCertFor(name,fcode,date){
+  if(!name||!fcode) return false;
+  if(DB.certificates.find(c=>c.fcode===fcode && c.name===name)) return false;
+  const num='CCIS-2026-'+fcode+'-'+String(DB.certificates.length+1).padStart(3,'0');
+  DB.certificates.push({num, fcode, name, date:date||new Date().toISOString().slice(0,10)});
+  return true;
+}
+function issueCert(fcode){ if(issueCertFor(USER.name,fcode)) save(); }
+function genCerts(){
+  const fcode=document.getElementById('certForm').value;
+  const who=document.getElementById('certBenef').value;
+  if(!fcode){ alert(t('formation')+' ?'); return; }
+  let n=0;
+  if(who==='__all__'){
+    const names=new Set();
+    DB.sessions.filter(s=>s.fcode===fcode).forEach(s=>s.inscrits.forEach(pid=>{const p=DB.participants.find(x=>x.id===pid); if(p)names.add(p.nom+' '+p.prenom);}));
+    names.forEach(nm=>{ if(issueCertFor(nm,fcode))n++; });
+  } else {
+    const p=DB.participants.find(x=>x.id===who);
+    if(p && issueCertFor(p.nom+' '+p.prenom,fcode))n++;
+  }
+  save(); alert(n+' '+t('certDone')); render();
+}
+function delCert(num){ if(confirm(t('confirmDel'))){ DB.certificates=DB.certificates.filter(c=>c.num!==num); save(); render(); } }
+function vCert(v){
+  const mine=DB.certificates;
+  v.innerHTML=`
+   <div class="panel"><h3>🏅 ${t('genCert')}</h3>
+     <div class="grid2">
+       <div class="field"><label>${t('formation')}</label>
+         <select id="certForm">${FORMATIONS.map(f=>`<option value="${f.code}">${f.code} · ${ftitle(f)}</option>`).join('')}</select></div>
+       <div class="field"><label>${t('beneficiary')}</label>
+         <select id="certBenef"><option value="__all__">★ ${t('allEnrolled')}</option>${DB.participants.map(p=>`<option value="${p.id}">${p.nom} ${p.prenom}</option>`).join('')}</select></div>
+     </div>
+     <button class="btn btn-sm" onclick="genCerts()">${t('genCert')}</button>
+     <p style="font-size:12px;color:var(--muted);margin-top:6px">${t('certHint')}</p>
+   </div>
+   <div style="color:var(--muted);font-size:13px;margin-bottom:10px">${mine.length} ${t('m_cert').toLowerCase()}</div>
+   <div id="certList"></div>`;
+  const list=v.querySelector('#certList');
+  if(!mine.length){ list.innerHTML=`<div class="empty">${t('noCerts')}</div>`; return; }
+  mine.slice().reverse().forEach(c=>{
+    const f=fById(c.fcode)||{j:'—',fr:c.fcode,ar:c.fcode};
+    const wrap=el(`<div style="margin-bottom:18px">
+      <div class="cert" id="cert_${c.num}">
+        <div class="seal">MA</div>
+        <h2>${t('certTitle')}</h2>
+        <p style="color:var(--muted);margin-top:6px">${t('awardedTo')}</p>
+        <div class="name">${c.name}</div>
+        <p>${t('forCompleting')}<br><b>${ftitle(f)}</b></p>
+        <p style="color:var(--muted);margin-top:8px">${t('certDur')} : ${f.j} ${t('days')} · ${t('certDate')} : ${c.date} · ${t('certNo')} ${c.num}</p>
+        <canvas class="qr" width="16" height="16" data-code="${c.num}"></canvas>
+        <div class="sig-row"><span>${t('director')}<br>_______________</span><span>Melkaoui Académie — CCIS</span><span>${t('signature')}<br>_______________</span></div>
+      </div>
+      <div class="right mt gap" style="justify-content:flex-end">
+        <button class="btn btn-sm" onclick="printCert('cert_${c.num}')">🖨️ ${t('download')}</button>
+        ${canEdit()?`<button class="btn btn-ghost btn-sm" style="color:var(--bad)" onclick="delCert('${c.num}')">🗑️ ${t('del')}</button>`:''}
+      </div>
+    </div>`);
+    list.appendChild(wrap);
+  });
+  v.querySelectorAll('.qr').forEach(cv=>drawQR(cv));
+}
+function drawQR(cv){
+  const ctx=cv.getContext('2d'); const s=cv.width; const seed=(cv.dataset.code||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,s,s);ctx.fillStyle='#0d3b40';
+  for(let y=0;y<s;y++)for(let x=0;x<s;x++){ if(((x*7+y*13+seed)%3===0)) ctx.fillRect(x,y,1,1); }
+  // corners
+  [[0,0],[s-3,0],[0,s-3]].forEach(([cx,cy])=>{ctx.fillRect(cx,cy,3,3);ctx.fillStyle='#fff';ctx.fillRect(cx+1,cy+1,1,1);ctx.fillStyle='#0d3b40';});
+}
+function printCert(id){
+  const node=document.getElementById(id);
+  const w=window.open('','','width=900,height=650');
+  w.document.write(`<html dir="${document.documentElement.dir}"><head><title>Certificat</title><style>
+    body{font-family:Segoe UI,Tahoma,sans-serif;padding:30px}
+    .cert{border:8px solid #0d5c63;border-radius:6px;padding:40px;text-align:center}
+    .seal{width:74px;height:74px;border-radius:50%;background:#0d5c63;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;margin:0 auto 12px;font-size:22px}
+    h2{color:#0d5c63}.name{font-size:30px;font-weight:800;margin:16px 0}.sig-row{display:flex;justify-content:space-between;margin-top:40px;color:#64748b;font-size:12px}
+  </style></head><body>${node.outerHTML}</body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),300);
+}
+
+/* -------- FORMATEURS (éditable) -------- */
+const canEdit=()=>['admin','responsable'].includes(USER.role);
+function vFormateurs(v){
+  const list=(DB.formateurs||[]).slice().sort((a,b)=>(b.codes||[]).length-(a.codes||[]).length);
+  v.innerHTML=`
+   <div class="kpi-grid">
+     <div class="kpi"><span class="ic">👨‍🏫</span><div class="v">${list.length}</div><div class="l">${t('m_form')}</div></div>
+     <div class="kpi"><span class="ic">📚</span><div class="v">20</div><div class="l">${t('kFormations')}</div></div>
+     <div class="kpi"><span class="ic">🎓</span><div class="v">${list.filter(x=>/Docteur/i.test(x.q)).length}</div><div class="l">Docteurs</div></div>
+   </div>
+   <div class="toolbar"><input class="grow" id="fmQ" placeholder="${t('search')}">
+     ${canEdit()?`<button class="btn btn-sm" onclick="formateurForm()">＋ ${t('addFormateur')}</button>`:''}
+     <button class="btn btn-ghost btn-sm" onclick="exportExcel()">⬇ ${t('dlExcel')}</button></div>
+   <div class="fgrid" id="fmGrid"></div>
+   <div class="panel" style="margin-top:16px;display:flex;gap:14px;align-items:center;border-inline-start:4px solid var(--accent)">
+     <div class="avatar" style="background:var(--accent)">${COORDINATEUR.n.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+     <div><b>${COORDINATEUR.n}</b><div style="font-size:12px;color:var(--muted)">${t('coordinator')} · ${COORDINATEUR.q} · ${COORDINATEUR.e}</div></div>
+   </div>`;
+  const draw=()=>{
+    const q=(v.querySelector('#fmQ').value||'').toLowerCase();
+    const g=v.querySelector('#fmGrid'); g.innerHTML='';
+    const rows=list.filter(x=>x.nom.toLowerCase().includes(q)||(x.codes||[]).some(c=>fById(c)&&ftitle(fById(c)).toLowerCase().includes(q)));
+    if(!rows.length){ g.innerHTML=`<div class="empty">${t('noResults')}</div>`; return; }
+    rows.forEach(x=>{
+      const codes=(x.codes||[]).map(c=>fById(c)?`<span class="badge ${fById(c).axe}" title="${ftitle(fById(c))}">${c}</span>`:'').join(' ');
+      const initials=x.nom.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      const contact=[x.tel,x.email].filter(Boolean).join(' · ');
+      const card=el(`<div class="fcard">
+        <div class="top"><div class="avatar" style="width:42px;height:42px;font-size:15px">${initials}</div>
+          <div class="gap" style="gap:5px;align-items:center"><span class="badge info">${x.e||'—'}</span>
+          ${canEdit()?`<button class="btn btn-ghost btn-sm" title="${t('edit')}" onclick="formateurForm('${x.id}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" title="${t('del')}" style="color:var(--bad)" onclick="delFormateur('${x.id}')">🗑️</button>`:''}</div>
+        </div>
+        <h4>${x.nom}</h4>
+        <div style="font-size:12px;color:var(--muted)">🎓 ${t('fQualif')} : ${x.q}</div>
+        ${contact?`<div style="font-size:11.5px;color:var(--muted)">📞 ${contact}</div>`:''}
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">${t('fAssures')} (${(x.codes||[]).length})</div>
+        <div class="gap" style="gap:5px">${codes}</div>
+      </div>`);
+      g.appendChild(card);
+    });
+  };
+  v.querySelector('#fmQ').oninput=draw; draw();
+}
+function formateurForm(id){
+  const f=id?(DB.formateurs.find(x=>x.id===id)||{}):{codes:[]};
+  const checks=FORMATIONS.map(x=>`<label style="display:flex;gap:6px;align-items:center;font-size:12px;font-weight:400"><input type="checkbox" class="fCode" value="${x.code}" ${(f.codes||[]).includes(x.code)?'checked':''}> ${x.code} · ${ftitle(x)}</label>`).join('');
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>${id?t('edit'):t('addFormateur')}</h3>
+   <div class="grid2 mt">
+     <div class="field"><label>${t('fName')}</label><input id="ffNom" value="${f.nom||''}"></div>
+     <div class="field"><label>${t('fQualif')}</label><input id="ffQ" value="${f.q||''}"></div>
+     <div class="field"><label>${t('fExp')}</label><input id="ffE" value="${f.e||''}"></div>
+     <div class="field"><label>${t('phone')}</label><input id="ffTel" value="${f.tel||''}"></div>
+     <div class="field"><label>${t('email')}</label><input id="ffEmail" value="${f.email||''}"></div>
+   </div>
+   <div class="field mt"><label>${t('fAssures')}</label>
+     <div style="max-height:170px;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:10px;display:grid;gap:6px">${checks}</div></div>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="saveFormateur('${id||''}')">${t('save')}</button></div>`);
+}
+function saveFormateur(id){
+  const g=x=>document.getElementById(x).value.trim();
+  const codes=[...document.querySelectorAll('.fCode:checked')].map(c=>c.value);
+  const nom=g('ffNom'); if(!nom){ alert(t('fName')+' ?'); return; }
+  const data={nom,q:g('ffQ'),e:g('ffE')||'—',tel:g('ffTel'),email:g('ffEmail'),codes};
+  if(id){ const f=DB.formateurs.find(x=>x.id===id); if(f)Object.assign(f,data); }
+  else { data.id='FR'+Date.now(); DB.formateurs.push(data); }
+  save(); closeModal(); render();
+}
+function delFormateur(id){
+  const f=DB.formateurs.find(x=>x.id===id); if(!f)return;
+  if(confirm(t('confirmDel')+'\n\n'+f.nom)){ DB.formateurs=DB.formateurs.filter(x=>x.id!==id); save(); render(); }
+}
+
+/* -------- SESSIONS -------- */
+function vSessions(v){
+  v.innerHTML=`<div class="toolbar"><input class="grow" id="sQ" placeholder="${t('search')}">
+     <button class="btn btn-sm" onclick="sessionForm()">＋ ${t('addSession')}</button>
+     <button class="btn btn-ghost btn-sm" onclick="exportExcel()">⬇ ${t('dlExcel')}</button></div>
+     <div class="panel" style="padding:0;overflow-x:auto"><table id="sTable"></table></div>`;
+  const draw=()=>{
+    const q=(v.querySelector('#sQ').value||'').toLowerCase();
+    const rows=DB.sessions.filter(s=>{const f=fById(s.fcode);return (ftitle(f).toLowerCase().includes(q)||s.ville.toLowerCase().includes(q)||s.formateur.toLowerCase().includes(q));});
+    const tb=v.querySelector('#sTable');
+    if(!rows.length){ tb.innerHTML=`<tr><td class="empty">${t('noSessions')}</td></tr>`; return; }
+    const act=canEdit();
+    tb.innerHTML=`<thead><tr><th>${t('formation')}</th><th>${t('ville')}</th><th>${t('start')}</th><th>${t('end')}</th><th>${t('trainer')}</th><th>${t('status')}</th><th>${t('enrolled')}</th>${act?`<th>${t('actions')}</th>`:''}</tr></thead><tbody>`+
+      rows.map(s=>{const f=fById(s.fcode);return `<tr>
+        <td><b>${f.code}</b> · ${ftitle(f)}</td><td>${s.ville}</td><td>${s.debut}</td><td>${s.fin}</td>
+        <td>${s.formateur}</td><td>${statusBadge(s.statut)}</td><td>${s.inscrits.length}/${s.capacite}</td>${act?`<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" title="${t('edit')}" onclick="sessionForm('${s.id}')">✏️</button> <button class="btn btn-ghost btn-sm" style="color:var(--bad)" title="${t('del')}" onclick="delSession('${s.id}')">🗑️</button></td>`:''}</tr>`;}).join('')+`</tbody>`;
+  };
+  v.querySelector('#sQ').oninput=draw; draw();
+}
+function sessionForm(id){
+  const s=id?(DB.sessions.find(x=>x.id===id)||{}):{};
+  const opt=(arr,sel)=>arr.map(x=>`<option ${x===sel?'selected':''}>${x}</option>`).join('');
+  const formOpts=DB.formateurs?DB.formateurs.map(f=>`<option ${f.nom===s.formateur?'selected':''}>${f.nom}</option>`).join(''):'';
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>${id?t('edit'):t('addSession')}</h3>
+   <div class="grid2 mt">
+     <div class="field"><label>${t('formation')}</label><select id="nfCode">${FORMATIONS.map(f=>`<option value="${f.code}" ${f.code===s.fcode?'selected':''}>${f.code} · ${ftitle(f)}</option>`).join('')}</select></div>
+     <div class="field"><label>${t('ville')}</label><select id="nfVille">${opt(VILLES,s.ville)}</select></div>
+     <div class="field"><label>${t('start')}</label><input type="date" id="nfDebut" value="${s.debut||'2026-09-01'}"></div>
+     <div class="field"><label>${t('end')}</label><input type="date" id="nfFin" value="${s.fin||'2026-09-04'}"></div>
+     <div class="field"><label>${t('trainer')}</label><select id="nfForm"><option value="">—</option>${formOpts}</select></div>
+     <div class="field"><label>${t('capacity')}</label><input type="number" id="nfCap" value="${s.capacite||20}"></div>
+     <div class="field"><label>${t('status')}</label><select id="nfStatut">
+       ${['brouillon','planifiee','ouvertes','complete','en_cours','terminee','annulee','reportee'].map(st=>`<option value="${st}" ${st===s.statut?'selected':''}>${t('st_'+st.replace('_',''))}</option>`).join('')}</select></div>
+   </div>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="saveSession('${id||''}')">${t('save')}</button></div>`);
+}
+function saveSession(id){
+  const g=x=>document.getElementById(x).value;
+  const data={fcode:g('nfCode'),ville:g('nfVille'),debut:g('nfDebut'),fin:g('nfFin'),
+    formateur:g('nfForm')||'—',capacite:+g('nfCap'),statut:g('nfStatut')};
+  if(id){ const s=DB.sessions.find(x=>x.id===id); if(s)Object.assign(s,data); }
+  else { data.id='s'+Date.now(); data.salle='—'; data.inscrits=[]; DB.sessions.push(data); }
+  save(); closeModal(); render();
+}
+function delSession(id){
+  const s=DB.sessions.find(x=>x.id===id); if(!s)return;
+  const f=fById(s.fcode);
+  if(confirm(t('confirmDel')+'\n\n'+(f?f.code+' · '+ftitle(f):'')+' — '+s.ville)){
+    DB.sessions=DB.sessions.filter(x=>x.id!==id);
+    DB.attendance=DB.attendance.filter(a=>a.sid!==id);
+    save(); render();
+  }
+}
+
+/* -------- PARTICIPANTS -------- */
+function vParticipants(v){
+  v.innerHTML=`<div class="toolbar"><input class="grow" id="pQ" placeholder="${t('search')}">
+     <button class="btn btn-sm" onclick="partForm()">＋ ${t('addPart')}</button>
+     <button class="btn btn-ghost btn-sm" onclick="exportExcel()">⬇ ${t('dlExcel')}</button></div>
+     <div class="panel" style="padding:0;overflow-x:auto"><table id="pTable"></table></div>`;
+  const draw=()=>{
+    const q=(v.querySelector('#pQ').value||'').toLowerCase();
+    const rows=DB.participants.filter(p=>(p.prenom+' '+p.nom+' '+p.org+' '+p.ville).toLowerCase().includes(q));
+    const tb=v.querySelector('#pTable');
+    if(!rows.length){ tb.innerHTML=`<tr><td class="empty">${t('noParts')}</td></tr>`; return; }
+    const act=canEdit();
+    tb.innerHTML=`<thead><tr><th>${t('lastName')} ${t('firstName')}</th><th>${t('org')}</th><th>${t('fonction')}</th><th>${t('category')}</th><th>${t('ville')}</th><th>${t('phone')}</th>${act?`<th>${t('actions')}</th>`:''}</tr></thead><tbody>`+
+      rows.map(p=>`<tr><td><b>${p.nom}</b> ${p.prenom}</td><td>${p.org}</td><td>${p.fonction}</td><td>${p.cat}</td><td>${p.ville}</td><td>${p.tel}</td>${act?`<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" title="${t('edit')}" onclick="partForm('${p.id}')">✏️</button> <button class="btn btn-ghost btn-sm" style="color:var(--bad)" title="${t('del')}" onclick="delPart('${p.id}')">🗑️</button></td>`:''}</tr>`).join('')+`</tbody>`;
+  };
+  v.querySelector('#pQ').oninput=draw; draw();
+}
+function partForm(id){
+  const p=id?(DB.participants.find(x=>x.id===id)||{}):{};
+  const opt=(arr,sel)=>arr.map(c=>`<option ${c===sel?'selected':''}>${c}</option>`).join('');
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>${id?t('edit'):t('addPart')}</h3>
+   <div class="grid2 mt">
+     <div class="field"><label>${t('firstName')}</label><input id="npPrenom" value="${p.prenom||''}"></div>
+     <div class="field"><label>${t('lastName')}</label><input id="npNom" value="${p.nom||''}"></div>
+     <div class="field"><label>CIN</label><input id="npCin" value="${p.cin||''}"></div>
+     <div class="field"><label>${t('org')}</label><input id="npOrg" value="${p.org||''}"></div>
+     <div class="field"><label>${t('fonction')}</label><input id="npFonc" value="${p.fonction||''}"></div>
+     <div class="field"><label>${t('category')}</label><select id="npCat">${opt(CATEGORIES[LANG],p.cat)}</select></div>
+     <div class="field"><label>${t('ville')}</label><select id="npVille">${opt(VILLES,p.ville)}</select></div>
+     <div class="field"><label>${t('phone')}</label><input id="npTel" value="${p.tel||''}"></div>
+     <div class="field"><label>${t('email')}</label><input id="npEmail" value="${p.email||''}"></div>
+   </div>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="savePart('${id||''}')">${t('save')}</button></div>`);
+}
+function savePart(id){
+  const g=x=>document.getElementById(x).value;
+  const data={prenom:g('npPrenom'),nom:g('npNom'),cin:g('npCin'),org:g('npOrg'),fonction:g('npFonc'),
+    cat:g('npCat'),ville:g('npVille'),tel:g('npTel'),email:g('npEmail')};
+  if(id){ const p=DB.participants.find(x=>x.id===id); if(p)Object.assign(p,data); }
+  else { data.id='p'+Date.now(); DB.participants.push(data); }
+  save(); closeModal(); render();
+}
+function delPart(id){
+  const p=DB.participants.find(x=>x.id===id); if(!p)return;
+  if(confirm(t('confirmDel')+'\n\n'+p.nom+' '+p.prenom)){
+    DB.participants=DB.participants.filter(x=>x.id!==id);
+    DB.sessions.forEach(s=>s.inscrits=s.inscrits.filter(pid=>pid!==id));
+    DB.attendance=DB.attendance.filter(a=>a.pid!==id);
+    DB.quizResults=DB.quizResults.filter(q=>q.pid!==id);
+    save(); render();
+  }
+}
+
+/* -------- PRÉSENCES -------- */
+let ATT_SESSION=null;
+function vAttendance(v){
+  const done=DB.sessions.filter(s=>['terminee','en_cours','complete','ouvertes'].includes(s.statut));
+  v.innerHTML=`<div class="toolbar"><label style="color:var(--muted)">${t('pickSession')}:</label>
+    <select id="attSel">${done.map(s=>{const f=fById(s.fcode);return `<option value="${s.id}">${f.code} · ${ftitle(f)} — ${s.ville}</option>`;}).join('')}</select></div>
+    <div id="attBody"></div>`;
+  const sel=v.querySelector('#attSel');
+  const draw=()=>{
+    const s=DB.sessions.find(x=>x.id===sel.value); if(!s){v.querySelector('#attBody').innerHTML=`<div class="empty">${t('noSessions')}</div>`;return;}
+    const rows=s.inscrits.map(pid=>{
+      const p=DB.participants.find(x=>x.id===pid)||{nom:'—',prenom:''};
+      let a=DB.attendance.find(x=>x.sid===s.id&&x.pid===pid);
+      if(!a){a={sid:s.id,pid,statut:'present'};DB.attendance.push(a);}
+      return {p,a};
+    });
+    const pres=rows.filter(r=>r.a.statut!=='absent').length;
+    const rate=rows.length?Math.round(pres/rows.length*100):0;
+    v.querySelector('#attBody').innerHTML=`
+      <div class="panel" style="display:flex;gap:20px;align-items:center"><b style="font-size:20px;color:var(--brand)">${rate}%</b><span style="color:var(--muted)">${t('attRate')}</span></div>
+      <div class="panel" style="padding:0;overflow-x:auto"><table><thead><tr><th>${t('lastName')} ${t('firstName')}</th><th>${t('org')}</th><th>${t('status')}</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td><b>${r.p.nom}</b> ${r.p.prenom}</td><td>${r.p.org||'—'}</td>
+        <td><select data-pid="${r.p.id}" class="attStatus">
+          ${['present','retard','absent'].map(st=>`<option value="${st}" ${r.a.statut===st?'selected':''}>${t('att_'+st)}</option>`).join('')}
+        </select></td></tr>`).join('')}
+      </tbody></table></div>`;
+    v.querySelectorAll('.attStatus').forEach(se=>se.onchange=()=>{
+      const a=DB.attendance.find(x=>x.sid===s.id&&x.pid===se.dataset.pid); a.statut=se.value; save(); draw();
+    });
+  };
+  sel.onchange=draw; draw();
+}
+
+/* -------- SATISFACTION -------- */
+let satVals={contenu:0,formateur:0,org:0,util:0};
+function vSatisfaction(v){
+  const sat=DB.satis;
+  const avg=k=>sat.length?(sat.reduce((a,x)=>a+x[k],0)/sat.length):0;
+  const global=sat.length?((avg('contenu')+avg('formateur')+avg('org')+avg('util'))/4):0;
+  const reco=sat.length?Math.round(sat.reduce((a,x)=>a+(x.reco||8),0)/sat.length*10):0;
+  satVals={contenu:0,formateur:0,org:0,util:0};
+  const stars=(key)=>`<div class="rating" data-key="${key}">${[1,2,3,4,5].map(i=>`<span class="star" data-v="${i}">★</span>`).join('')}</div>`;
+  v.innerHTML=`
+   <div class="kpi-grid">
+     <div class="kpi"><div class="v">${global.toFixed(1)}/5</div><div class="l">${t('satAvg')}</div></div>
+     <div class="kpi"><div class="v">${reco}%</div><div class="l">${t('recommend')}</div></div>
+     <div class="kpi"><div class="v">${sat.length}</div><div class="l">${t('m_sat')}</div></div>
+   </div>
+   <div class="charts">
+     <div class="panel"><h3>⭐ ${t('satTitle')}</h3>
+       <div class="field"><label>${t('satContent')}</label>${stars('contenu')}</div>
+       <div class="field"><label>${t('satTrainer')}</label>${stars('formateur')}</div>
+       <div class="field"><label>${t('satOrg')}</label>${stars('org')}</div>
+       <div class="field"><label>${t('satUtil')}</label>${stars('util')}</div>
+       <div class="field"><label>${t('comment')}</label><textarea id="satComment" rows="2"></textarea></div>
+       <button class="btn btn-sm" onclick="saveSat()">${t('submit')}</button>
+     </div>
+     <div class="chart-box"><h4>${t('overview')}</h4><canvas id="satChart"></canvas></div>
+   </div>`;
+  v.querySelectorAll('.rating').forEach(r=>{
+    r.querySelectorAll('.star').forEach(s=>s.onclick=()=>{
+      const val=+s.dataset.v; satVals[r.dataset.key]=val;
+      r.querySelectorAll('.star').forEach(x=>x.classList.toggle('on',+x.dataset.v<=val));
+    });
+  });
+  charts.push(new Chart(document.getElementById('satChart'),{type:'radar',
+    data:{labels:[t('satContent'),t('satTrainer'),t('satOrg'),t('satUtil')],
+      datasets:[{data:[avg('contenu'),avg('formateur'),avg('org'),avg('util')],borderColor:'#14919b',backgroundColor:'rgba(20,145,155,.2)'}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:5}}}}));
+}
+function saveSat(){
+  if(!satVals.contenu){ alert(t('satContent')+' ?'); return; }
+  DB.satis.push({sid:'self',fcode:CURRENT_COURSE||'F17',...satVals,reco:Math.round((satVals.contenu+satVals.util)/2*2),comment:document.getElementById('satComment').value});
+  save(); render();
+}
+
+/* -------- BIBLIOTHÈQUE (dossiers + fichiers PDF/Audio/Vidéo via IndexedDB) -------- */
+let _idb=null;
+function idb(){ return new Promise((res,rej)=>{ if(_idb)return res(_idb);
+  const r=indexedDB.open('melkaoui_files',1);
+  r.onupgradeneeded=e=>{ if(!e.target.result.objectStoreNames.contains('files')) e.target.result.createObjectStore('files',{keyPath:'id'}); };
+  r.onsuccess=e=>{ _idb=e.target.result; res(_idb); }; r.onerror=e=>rej(e.target.error||new Error('IndexedDB')); }); }
+function idbPut(id,blob){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('files','readwrite'); tx.objectStore('files').put({id,blob}); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); })); }
+function idbGet(id){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('files','readonly'); const rq=tx.objectStore('files').get(id); rq.onsuccess=()=>res(rq.result&&rq.result.blob); rq.onerror=e=>rej(e.target.error); })); }
+function idbDel(id){ return idb().then(db=>new Promise((res)=>{ const tx=db.transaction('files','readwrite'); tx.objectStore('files').delete(id); tx.oncomplete=()=>res(); })); }
+function typeFromMime(m,name){ m=m||''; name=(name||'').toLowerCase();
+  if(/pdf/.test(m)||name.endsWith('.pdf'))return'PDF';
+  if(/^audio/.test(m)||/\.(mp3|wav|ogg|m4a|aac)$/.test(name))return'Audio';
+  if(/^video/.test(m)||/\.(mp4|webm|mov|avi|mkv)$/.test(name))return'Vidéo';
+  if(/^image/.test(m)||/\.(png|jpe?g|gif|webp|svg)$/.test(name))return'Image';
+  if(/(word|document)/.test(m)||/\.(docx?|odt)$/.test(name))return'Document';
+  if(/(presentation|powerpoint)/.test(m)||/\.(pptx?|odp)$/.test(name))return'Présentation';
+  return'Autre'; }
+const LIB_ICON={PDF:'📄',Audio:'🔊','Vidéo':'🎬',Image:'🖼️',Document:'📝','Présentation':'📊',Autre:'📎'};
+function libFolders(){ return [{code:'GEN',name:'Général'}].concat(FORMATIONS.map(f=>({code:f.code,name:f.code+' · '+ftitle(f)}))); }
+let LIB_FOLDER=null;
+function vLibrary(v){
+  DB.library=DB.library||[];
+  if(!LIB_FOLDER){
+    v.innerHTML=`<div class="toolbar"><input class="grow" id="libQ" placeholder="${t('search')}">
+       ${canEdit()?`<button class="btn btn-sm" onclick="libAddFile('GEN')">＋ ${t('addFile')}</button>`:''}</div>
+       <div class="fgrid" id="libFolders"></div>`;
+    const draw=()=>{
+      const q=(v.querySelector('#libQ').value||'').toLowerCase();
+      const g=v.querySelector('#libFolders'); g.innerHTML='';
+      // si recherche : liste plate de fichiers correspondants
+      if(q){
+        const hits=DB.library.filter(x=>x.title.toLowerCase().includes(q));
+        if(!hits.length){ g.innerHTML=`<div class="empty">${t('noResults')}</div>`; return; }
+        hits.forEach(fl=>g.appendChild(fileCard(fl))); return;
+      }
+      libFolders().forEach(fo=>{
+        const files=DB.library.filter(x=>x.fcode===fo.code);
+        const card=el(`<div class="fcard" style="cursor:pointer">
+          <div style="font-size:34px">📁</div>
+          <h4 style="font-size:13.5px">${fo.name}</h4>
+          <div class="meta"><span>${files.length} ${t('files')}</span></div></div>`);
+        card.onclick=()=>{ LIB_FOLDER=fo.code; vLibrary(v); };
+        g.appendChild(card);
+      });
+    };
+    v.querySelector('#libQ').oninput=draw; draw(); return;
+  }
+  const fo=libFolders().find(x=>x.code===LIB_FOLDER)||{name:LIB_FOLDER};
+  const files=DB.library.filter(x=>x.fcode===LIB_FOLDER);
+  v.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="LIB_FOLDER=null;vLibrary(document.getElementById('view'))">← ${t('m_lib')}</button>
+    <div class="toolbar" style="margin-top:10px"><b style="flex:1">📁 ${fo.name}</b>
+      ${canEdit()?`<button class="btn btn-sm" onclick="libAddFile('${LIB_FOLDER}')">＋ ${t('addFile')}</button>`:''}</div>
+    <div class="fgrid" id="libGrid"></div>`;
+  const g=v.querySelector('#libGrid');
+  if(!files.length){ g.innerHTML=`<div class="empty">${t('noFiles')}</div>`; return; }
+  files.forEach(fl=>g.appendChild(fileCard(fl)));
+}
+function fileCard(fl){
+  const ic=LIB_ICON[fl.type]||'📎';
+  const safe=(fl.title||'').replace(/'/g,'’');
+  return el(`<div class="fcard">
+    <div class="top"><span style="font-size:28px">${ic}</span><span class="badge info">${fl.type}</span></div>
+    <h4 style="font-size:13.5px">${fl.title}</h4>
+    <div class="meta"><span>${fl.size?(fl.size/1024).toFixed(0)+' Ko':''}</span><span>${fl.date||''}</span></div>
+    <div class="gap" style="gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="libOpen('${fl.id}')">👁️ ${t('open')}</button>
+      <button class="btn btn-ghost btn-sm" onclick="libDownload('${fl.id}','${safe}')">⬇</button>
+      ${canEdit()?`<button class="btn btn-ghost btn-sm" style="color:var(--bad)" onclick="libDelete('${fl.id}')">🗑️</button>`:''}
+    </div></div>`);
+}
+function libAddFile(fcode){
+  const folders=libFolders();
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>${t('addFile')}</h3>
+   <div class="field mt"><label>${t('title')} ${t('optional')}</label><input id="lfTitle" placeholder="${t('title')}"></div>
+   <div class="field"><label>${t('folder')}</label><select id="lfFolder">${folders.map(f=>`<option value="${f.code}" ${f.code===fcode?'selected':''}>${f.name}</option>`).join('')}</select></div>
+   <div class="field"><label>${t('file')}</label><input type="file" id="lfFile" accept=".pdf,audio/*,video/*,image/*,.doc,.docx,.ppt,.pptx"></div>
+   <p style="font-size:11.5px;color:var(--muted)">${t('libHint')}</p>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="libSave()">${t('save')}</button></div>`);
+}
+function libSave(){
+  const file=document.getElementById('lfFile').files[0];
+  if(!file){ alert(t('file')+' ?'); return; }
+  const folder=document.getElementById('lfFolder').value;
+  const title=document.getElementById('lfTitle').value.trim()||file.name;
+  const id='lib'+Date.now();
+  idbPut(id,file).then(()=>{
+    DB.library.push({id,title,type:typeFromMime(file.type,file.name),mime:file.type,fcode:folder,size:file.size,date:new Date().toISOString().slice(0,10)});
+    save(); closeModal(); LIB_FOLDER=folder; render();
+  }).catch(e=>alert(t('libErr')+' : '+(e.message||e)));
+}
+function mimeFromName(name){ name=(name||'').toLowerCase();
+  if(name.endsWith('.mp4'))return'video/mp4'; if(name.endsWith('.webm'))return'video/webm'; if(name.endsWith('.mov'))return'video/quicktime'; if(name.endsWith('.m4v'))return'video/mp4';
+  if(name.endsWith('.mp3'))return'audio/mpeg'; if(name.endsWith('.wav'))return'audio/wav'; if(name.endsWith('.ogg'))return'audio/ogg'; if(name.endsWith('.m4a'))return'audio/mp4'; if(name.endsWith('.aac'))return'audio/aac';
+  if(name.endsWith('.pdf'))return'application/pdf';
+  if(/\.png$/.test(name))return'image/png'; if(/\.jpe?g$/.test(name))return'image/jpeg'; if(/\.gif$/.test(name))return'image/gif'; if(/\.webp$/.test(name))return'image/webp';
+  return''; }
+let _libURL=null;
+function libRevoke(){ if(_libURL){ URL.revokeObjectURL(_libURL); _libURL=null; } }
+function libOpen(id){
+  const meta=DB.library.find(x=>x.id===id)||{};
+  idbGet(id).then(b=>{
+    if(!b){ alert(t('noFiles')); return; }
+    const mime=meta.mime||b.type||mimeFromName(meta.title||'');
+    if((!b.type||b.type==='application/octet-stream') && mime) b=new Blob([b],{type:mime}); // reconstruit le type MIME
+    libRevoke(); const url=URL.createObjectURL(b); _libURL=url;
+    const kind=meta.type||typeFromMime(mime,meta.title||'');
+    let inner, wide=false;
+    if(kind==='Vidéo'){ inner=`<video src="${url}" controls autoplay playsinline style="width:100%;max-height:68vh;border-radius:10px;background:#000"></video>`; wide=true; }
+    else if(kind==='Audio'){ inner=`<audio src="${url}" controls autoplay style="width:100%"></audio>`; }
+    else if(kind==='Image'){ inner=`<img src="${url}" style="width:100%;border-radius:10px">`; wide=true; }
+    else if(kind==='PDF'){ inner=`<iframe src="${url}" style="width:100%;height:70vh;border:none;border-radius:10px"></iframe>`; wide=true; }
+    else { const a=document.createElement('a'); a.href=url; a.download=meta.title||'fichier'; a.click(); return; }
+    const safe=(meta.title||'').replace(/'/g,'’');
+    showModal(`<button class="close" onclick="libRevoke();closeModal()">×</button>
+      <h3 style="margin-bottom:12px">${LIB_ICON[kind]||'📎'} ${meta.title||''}</h3>
+      ${inner}
+      <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="libDownload('${id}','${safe}')">⬇ ${t('download')}</button>
+      <button class="btn btn-sm" onclick="libRevoke();closeModal()">${t('cancel')}</button></div>`,wide);
+  }).catch(e=>alert((t('libErr')||'')+' : '+(e.message||e)));
+}
+function libDownload(id,name){ idbGet(id).then(b=>{ if(!b)return; const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),5000); }); }
+function libDelete(id){ if(!confirm(t('confirmDel')))return; idbDel(id).then(()=>{ DB.library=DB.library.filter(x=>x.id!==id); save(); render(); }); }
+
+/* -------- ASSISTANT IA -------- */
+let aiHistory=[];
+function vAssistant(v){
+  v.innerHTML=`<div class="panel">
+     <div class="assistant-log" id="aiLog"></div>
+     <div class="toolbar" style="margin:0"><input class="grow" id="aiInput" placeholder="${t('aiPlace')}" onkeydown="if(event.key==='Enter')aiAsk()">
+     <button class="btn btn-sm" onclick="aiAsk()">${t('aiSend')}</button></div>
+   </div>`;
+  if(!aiHistory.length) aiHistory=[{r:'a',txt:t('aiIntro')}];
+  drawAI();
+}
+function drawAI(){
+  const log=document.getElementById('aiLog'); if(!log)return;
+  log.innerHTML=aiHistory.map(m=>`<div class="msg ${m.r}"><div class="bub">${m.txt}</div>${m.src?`<div class="src">📎 ${t('aiSource')} : ${m.src}</div>`:''}</div>`).join('');
+  log.scrollTop=log.scrollHeight;
+}
+function aiAsk(){
+  const inp=document.getElementById('aiInput'); const q=inp.value.trim(); if(!q)return;
+  aiHistory.push({r:'u',txt:q}); inp.value='';
+  // recherche dans les contenus validés
+  const ql=q.toLowerCase();
+  let best=null,score=0;
+  FORMATIONS.forEach(f=>{
+    let sc=0; const hay=(f.fr+' '+f.ar+' '+f.c.join(' ')).toLowerCase();
+    ql.split(/\s+/).forEach(w=>{ if(w.length>3&&hay.includes(w))sc++; });
+    if(sc>score){score=sc;best=f;}
+  });
+  let ans;
+  if(!best||score===0){ ans={r:'a',txt:t('aiNoDoc')}; }
+  else{
+    const pt=best.c.slice(0,4).map(x=>'• '+x).join('<br>');
+    ans={r:'a',src:best.code+' · '+ftitle(best),
+      txt: (LANG==='ar'
+        ? `بالاستناد إلى المحتوى المعتمد لتكوين «${ftitle(best)}» (المدة: ${best.j} ي)، إليك أبرز العناصر:<br>${pt}`
+        : `D'après le contenu validé de la formation « ${ftitle(best)} » (durée ${best.j} ${t('days')}), voici les éléments clés :<br>${pt}`) };
+  }
+  aiHistory.push(ans); drawAI();
+}
+
+/* -------- PROMPT STUDIO -------- */
+function vPrompt(v){
+  const themes=['Communication numérique','Audit','Finance','Marchés publics','Qualité','E-commerce','Relations institutionnelles','Gestion des stocks','Procédures administratives'];
+  v.innerHTML=`<div class="panel"><h3>✨ ${t('promptStudioT')}</h3>
+    <div class="grid2">
+      <div class="field"><label>${t('pRole')}</label><input id="ps_role" value="Formateur expert"></div>
+      <div class="field"><label>${t('pAudience')}</label><input id="ps_aud" value="Cadres CCIS"></div>
+      <div class="field"><label>${t('pContext')}</label><input id="ps_ctx" value="${themes[0]}"></div>
+      <div class="field"><label>${t('pObjective')}</label><input id="ps_obj" value="Préparer un plan d'action"></div>
+      <div class="field"><label>${t('pFormat')}</label><select id="ps_fmt"><option>Liste à puces</option><option>Tableau</option><option>Texte structuré</option><option>Étapes numérotées</option></select></div>
+      <div class="field"><label>${t('pTone')}</label><select id="ps_tone"><option>Professionnel</option><option>Pédagogique</option><option>Concis</option></select></div>
+      <div class="field"><label>${t('pLength')}</label><select id="ps_len"><option>Court</option><option>Moyen</option><option>Détaillé</option></select></div>
+      <div class="field"><label>${t('lang')}</label><select id="ps_lang"><option>Français</option><option>العربية</option><option>FR + AR</option></select></div>
+    </div>
+    <button class="btn btn-sm" onclick="genPrompt()">${t('generate')}</button>
+    <div class="field mt"><label>${t('result')}</label><textarea id="ps_out" rows="7" readonly></textarea></div>
+    <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('ps_out').value)">📋 ${t('copy')}</button>
+  </div>`;
+}
+function genPrompt(){
+  const g=id=>document.getElementById(id).value;
+  const out=`Tu es ${g('ps_role')}.
+Contexte : ${g('ps_ctx')} (programme CCIS Marrakech-Safi 2026).
+Public cible : ${g('ps_aud')}.
+Objectif : ${g('ps_obj')}.
+Format attendu : ${g('ps_fmt')}.
+Ton : ${g('ps_tone')}. Longueur : ${g('ps_len')}. Langue : ${g('ps_lang')}.
+Contraintes : rester fidèle au contenu de formation validé, citer des exemples concrets adaptés au tissu économique de la région Marrakech-Safi, et proposer des étapes actionnables.`;
+  document.getElementById('ps_out').value=out;
+}
+
+/* -------- RAPPORTS -------- */
+function vReports(v){
+  const perForm=FORMATIONS.map(f=>{
+    const ss=DB.sessions.filter(s=>s.fcode===f.code); let part=0; ss.forEach(s=>part+=s.inscrits.length);
+    const qr=DB.quizResults.filter(q=>q.fcode===f.code); const avg=qr.length?Math.round(qr.reduce((a,x)=>a+x.score,0)/qr.length):0;
+    return {f,sessions:ss.length,part,avg,jours:f.j};
+  });
+  const totalJ=FORMATIONS.reduce((a,f)=>a+f.j,0);
+  v.innerHTML=`<div class="toolbar"><h3 style="flex:1">${t('reports')}</h3>
+     <button class="btn btn-ghost btn-sm" onclick="exportExcel()">⬇ Excel</button>
+     <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
+     <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ ${t('print')}</button></div>
+   <div class="panel" style="display:flex;gap:24px;flex-wrap:wrap">
+     <div><b style="font-size:22px;color:var(--brand)">${totalJ}</b> <span style="color:var(--muted)">${t('kJours')} (${t('of')} 42)</span></div>
+     <div><b style="font-size:22px;color:var(--brand)">${DB.sessions.length}</b> <span style="color:var(--muted)">${t('kSessions')}</span></div>
+     <div><b style="font-size:22px;color:var(--brand)">${new Set(DB.sessions.flatMap(s=>s.inscrits)).size}</b> <span style="color:var(--muted)">${t('kBenef')}</span></div>
+   </div>
+   <div class="panel" style="padding:0;overflow-x:auto"><table>
+     <thead><tr><th>${t('formation')}</th><th>${t('axis')}</th><th>${t('duration')}</th><th>${t('m_sess')}</th><th>${t('enrolled')}</th><th>${t('kReussite')}</th></tr></thead>
+     <tbody>${perForm.map(r=>`<tr><td><b>${r.f.code}</b> ${ftitle(r.f)}</td><td><span class="badge ${r.f.axe}">${r.f.axe}</span></td>
+       <td>${r.jours} ${t('days')}</td><td>${r.sessions}</td><td>${r.part}</td><td>${r.avg}%</td></tr>`).join('')}</tbody>
+   </table></div>`;
+}
+function exportCSV(){
+  let csv='Code;Titre;Axe;Duree;Sessions;Inscrits;Reussite%\n';
+  FORMATIONS.forEach(f=>{
+    const ss=DB.sessions.filter(s=>s.fcode===f.code); let part=0;ss.forEach(s=>part+=s.inscrits.length);
+    const qr=DB.quizResults.filter(q=>q.fcode===f.code); const avg=qr.length?Math.round(qr.reduce((a,x)=>a+x.score,0)/qr.length):0;
+    csv+=`${f.code};${f.fr};${f.axe};${f.j};${ss.length};${part};${avg}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='rapport_ccis_2026.csv'; a.click();
+}
+
+/* ===== IMPORT / EXPORT EXCEL (SheetJS) ===== */
+const STATUT_LBL={brouillon:'Brouillon',planifiee:'Planifiée',ouvertes:'Inscriptions ouvertes',complete:'Complète',en_cours:'En cours',terminee:'Terminée',annulee:'Annulée',reportee:'Reportée'};
+const STATUT_KEY=Object.fromEntries(Object.entries(STATUT_LBL).map(([k,v])=>[v,k]));
+const PRES_LBL={present:'Présent',retard:'Retard',absent:'Absent'};
+const PRES_KEY={'Présent':'present','Retard':'retard','Absent':'absent'};
+function pName(pid){ const p=DB.participants.find(x=>x.id===pid); return p?p.nom+' '+p.prenom:''; }
+function exportExcel(){
+  if(typeof XLSX==='undefined'){ alert('Bibliothèque Excel non chargée (vérifiez la connexion).'); return; }
+  const wb=XLSX.utils.book_new();
+  const add=(name,aoa)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),name);
+  add('Formations',[['Code','Titre (FR)','Titre (AR)','Axe','Durée (jours)','Contenus'],
+    ...FORMATIONS.map(f=>[f.code,f.fr,f.ar,f.axe,f.j,f.c.join(' ; ')])]);
+  add('Formateurs',[['ID','Nom & Prénom','Statut / Qualification','Expérience','Formations assurées (codes)','Téléphone','Email'],
+    ...(DB.formateurs||[]).map(f=>[f.id,f.nom,f.q,f.e,(f.codes||[]).join(' '),f.tel||'',f.email||''])]);
+  add('Beneficiaires',[['ID','Nom','Prénom','CIN','Téléphone','Email','Entreprise','Fonction','Ville','Catégorie'],
+    ...DB.participants.map(p=>[p.id,p.nom,p.prenom,p.cin||'',p.tel,p.email,p.org,p.fonction,p.ville,p.cat])]);
+  add('Sessions',[['ID','Formation (code)','Ville','Salle','Date début','Date fin','Formateur','Capacité','Statut'],
+    ...DB.sessions.map(s=>[s.id,s.fcode,s.ville,s.salle||'',s.debut,s.fin,s.formateur,s.capacite,STATUT_LBL[s.statut]||s.statut])]);
+  const ins=[['Session ID','Bénéficiaire ID','Bénéficiaire']];
+  DB.sessions.forEach(s=>s.inscrits.forEach(pid=>ins.push([s.id,pid,pName(pid)])));
+  add('Inscriptions',ins);
+  add('Presences',[['Session ID','Bénéficiaire ID','Statut'],
+    ...DB.attendance.map(a=>[a.sid,a.pid,PRES_LBL[a.statut]||a.statut])]);
+  add('Resultats_Quiz',[['Bénéficiaire ID','Formation (code)','Session ID','Score /100'],
+    ...DB.quizResults.map(q=>[q.pid,q.fcode,q.sid,q.score])]);
+  add('Certificats',[['Numéro','Formation (code)','Bénéficiaire','Date'],
+    ...DB.certificates.map(c=>[c.num,c.fcode,c.name,c.date])]);
+  add('Satisfaction',[['Session ID','Formation (code)','Note contenu','Note formateur','Note organisation','Note utilité','Recommandation','Commentaire'],
+    ...DB.satis.map(s=>[s.sid,s.fcode,s.contenu,s.formateur,s.org,s.util,s.reco||'',s.comment||''])]);
+  add('Ref_Villes',[['Ville'],...VILLES.map(x=>[x])]);
+  add('Ref_Axes',[['Code','Libellé'],...Object.keys(AXES).map(k=>[k,AXES[k].fr])]);
+  add('Ref_Categories',[['Catégorie'],...CATEGORIES.fr.map(x=>[x])]);
+  add('Ref_Statuts',[['Statut'],...Object.values(STATUT_LBL).map(x=>[x])]);
+  // Feuille guide en tête
+  const nb=DB.sessions.length, benef=new Set(DB.sessions.flatMap(s=>s.inscrits)).size;
+  const guide=XLSX.utils.aoa_to_sheet([
+    ['Base de données — Melkaoui Académie / CCIS Formation 2026'],
+    ['Marrakech-Safi · '+new Date().toLocaleDateString('fr-FR')],
+    [],
+    ['Programme','20 formations · 42 jours · 7 villes'],
+    ['Formateurs',(DB.formateurs||[]).length],['Bénéficiaires',DB.participants.length],
+    ['Sessions',nb],['Inscriptions (total)',DB.sessions.reduce((a,s)=>a+s.inscrits.length,0)],
+    [],
+    ['Onglets','Formations, Formateurs, Beneficiaires, Sessions, Inscriptions, Presences, Resultats_Quiz, Certificats, Satisfaction, Ref_*'],
+    ['Réimport','Paramètres → Importer un classeur Excel (les colonnes sont reconnues par leur nom).']
+  ]);
+  XLSX.utils.book_append_sheet(wb,guide,'Lisez-moi');
+  // place Lisez-moi en première position
+  const i=wb.SheetNames.indexOf('Lisez-moi'); if(i>0){ wb.SheetNames.splice(i,1); wb.SheetNames.unshift('Lisez-moi'); }
+  XLSX.writeFile(wb,'Base_de_donnees_CCIS_2026.xlsx');
+}
+function normKey(k){ return String(k).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''); }
+function toISO(v){ if(v==null||v==='')return ''; if(v instanceof Date)return v.toISOString().slice(0,10);
+  if(typeof v==='number'){ const d=new Date(Math.round((v-25569)*86400000)); return d.toISOString().slice(0,10); }
+  return String(v).slice(0,10); }
+function importExcel(file){
+  if(typeof XLSX==='undefined'){ alert('Bibliothèque Excel non chargée.'); return; }
+  const rd=new FileReader();
+  rd.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      // renvoie les lignes d'un onglet en objets normalisés {clé sans accents/espaces -> valeur}
+      const objs=name=>{ const ws=wb.Sheets[name]; if(!ws)return null;
+        return XLSX.utils.sheet_to_json(ws,{defval:''}).map(o=>{ const m={}; Object.keys(o).forEach(k=>m[normKey(k)]=o[k]); return m; }); };
+      const pick=(o,...names)=>{ for(const n of names){ const v=o[normKey(n)]; if(v!==undefined&&v!=='')return v; } return ''; };
+
+      const FM=objs('Formateurs'); if(FM){ DB.formateurs=FM.filter(o=>pick(o,'Nom & Prénom','Nom & Prenom','Nom','Formateur')!=='').map((o,i)=>({
+        id:String(pick(o,'ID')||('FR'+(i+1))),nom:String(pick(o,'Nom & Prénom','Nom & Prenom','Nom','Formateur')),
+        q:String(pick(o,'Statut / Qualification','Qualification','Statut')),e:String(pick(o,'Expérience','Experience')||'—'),
+        codes:String(pick(o,'Formations assurées (codes)','Formations assurées','Formations','Codes')).split(/[\s,;]+/).filter(Boolean),
+        tel:String(pick(o,'Téléphone','Telephone')),email:String(pick(o,'Email'))})); }
+      const B=objs('Beneficiaires')||objs('Inscrits'); if(B){ DB.participants=B.filter(o=>pick(o,'ID')!=='').map(o=>({
+        id:String(pick(o,'ID')),nom:String(pick(o,'Nom')),prenom:String(pick(o,'Prénom','Prenom')),cin:String(pick(o,'CIN')),
+        tel:String(pick(o,'Téléphone','Telephone')),email:String(pick(o,'Email')),org:String(pick(o,'Entreprise')),
+        fonction:String(pick(o,'Fonction')),ville:String(pick(o,'Ville')),cat:String(pick(o,'Catégorie','Categorie'))})); }
+
+      const S=objs('Sessions'); const INS=objs('Inscriptions');
+      if(S){
+        const byS={}; (INS||[]).forEach(o=>{ const sid=String(pick(o,'Session ID','Session')); const pid=String(pick(o,'Bénéficiaire ID','Beneficiaire ID','Bénéficiaire'));
+          if(sid&&pid){ (byS[sid]=byS[sid]||[]).push(pid); } });
+        DB.sessions=S.filter(o=>pick(o,'ID')!=='').map(o=>{ const id=String(pick(o,'ID')); return {
+          id,fcode:String(pick(o,'Formation (code)','Formation code','Formation')),ville:String(pick(o,'Ville')),salle:String(pick(o,'Salle')),
+          debut:toISO(pick(o,'Date début','Date debut')),fin:toISO(pick(o,'Date fin')),formateur:String(pick(o,'Formateur')),
+          capacite:+pick(o,'Capacité','Capacite')||20,statut:STATUT_KEY[pick(o,'Statut')]||'planifiee',inscrits:byS[id]||[]}; });
+      }
+      const P=objs('Presences'); if(P){ DB.attendance=P.filter(o=>pick(o,'Session ID','Session')!=='').map(o=>({
+        sid:String(pick(o,'Session ID','Session')),pid:String(pick(o,'Bénéficiaire ID','Beneficiaire ID')),statut:PRES_KEY[pick(o,'Statut')]||'present'})); }
+      const Q=objs('Resultats_Quiz'); if(Q){ DB.quizResults=Q.filter(o=>pick(o,'Bénéficiaire ID','Beneficiaire ID')!=='').map(o=>({
+        pid:String(pick(o,'Bénéficiaire ID','Beneficiaire ID')),fcode:String(pick(o,'Formation (code)','Formation')),sid:String(pick(o,'Session ID','Session')),score:+pick(o,'Score /100','Score')||0})); }
+      const C=objs('Certificats'); if(C){ DB.certificates=C.filter(o=>pick(o,'Numéro','Numero')!=='').map(o=>({
+        num:String(pick(o,'Numéro','Numero')),fcode:String(pick(o,'Formation (code)','Formation')),name:String(pick(o,'Bénéficiaire','Beneficiaire')),date:toISO(pick(o,'Date délivrance','Date'))})); }
+      const T=objs('Satisfaction'); if(T){ DB.satis=T.filter(o=>pick(o,'Session ID','Session')!=='').map(o=>({
+        sid:String(pick(o,'Session ID','Session')),fcode:String(pick(o,'Formation (code)','Formation')),
+        contenu:+pick(o,'Note contenu /5','Note contenu')||0,formateur:+pick(o,'Note formateur /5','Note formateur')||0,
+        org:+pick(o,'Note organisation /5','Note organisation')||0,util:+pick(o,'Note utilité /5','Note utilite')||0,
+        reco:+pick(o,'Recommandation /10','Recommandation')||0,comment:String(pick(o,'Commentaire'))})); }
+      save(); render(); alert(t('importOk'));
+    }catch(err){ alert('Import Excel : '+err.message); }
+  };
+  rd.readAsArrayBuffer(file);
+}
+
+/* -------- UTILISATEURS / COMPTES (admin) -------- */
+function vUsers(v){
+  const list=DB.users||[];
+  v.innerHTML=`<div class="toolbar"><input class="grow" id="uQ" placeholder="${t('search')}">
+     <button class="btn btn-sm" onclick="userForm()">＋ ${t('addUser')}</button></div>
+     <div class="panel" style="padding:0;overflow-x:auto"><table id="uTable"></table></div>
+     <p style="color:var(--muted);font-size:12px;margin-top:10px">${t('userHint')}</p>`;
+  const draw=()=>{
+    const q=(v.querySelector('#uQ').value||'').toLowerCase();
+    const rows=list.filter(u=>(u.nom+' '+u.username+' '+u.role).toLowerCase().includes(q));
+    const tb=v.querySelector('#uTable');
+    if(!rows.length){ tb.innerHTML=`<tr><td class="empty">${t('noResults')}</td></tr>`; return; }
+    tb.innerHTML=`<thead><tr><th>${t('name')}</th><th>${t('username')}</th><th>${t('role')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr></thead><tbody>`+
+      rows.map(u=>`<tr>
+        <td><b>${u.nom}</b></td><td>${u.username}</td><td>${t(ROLE_LABEL[u.role]||u.role)}</td>
+        <td>${u.actif===false?`<span class="badge bad">${t('inactive')}</span>`:`<span class="badge ok">${t('active')}</span>`}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" title="${t('edit')}" onclick="userForm('${u.id}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" title="${t('resetPw')}" onclick="resetPw('${u.id}')">🔑</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--bad)" title="${t('del')}" onclick="delUser('${u.id}')">🗑️</button>
+        </td></tr>`).join('')+`</tbody>`;
+  };
+  v.querySelector('#uQ').oninput=draw; draw();
+}
+function userForm(id){
+  const u=id?(DB.users.find(x=>x.id===id)||{}):{actif:true};
+  const roles=['admin','responsable','formateur','participant','institution'];
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>${id?t('edit'):t('addUser')}</h3>
+   <div class="grid2 mt">
+     <div class="field"><label>${t('name')}</label><input id="uNom" value="${u.nom||''}"></div>
+     <div class="field"><label>${t('username')}</label><input id="uUser" value="${u.username||''}" autocomplete="off"></div>
+     <div class="field"><label>${t('role')}</label><select id="uRole">${roles.map(r=>`<option value="${r}" ${r===u.role?'selected':''}>${t(ROLE_LABEL[r])}</option>`).join('')}</select></div>
+     <div class="field"><label>${t('status')}</label><select id="uActif"><option value="1" ${u.actif!==false?'selected':''}>${t('active')}</option><option value="0" ${u.actif===false?'selected':''}>${t('inactive')}</option></select></div>
+     <div class="field"><label>${t('password')} ${id?t('pwKeep'):''}</label><input id="uPass" type="text" autocomplete="new-password" placeholder="${id?'••••••':''}"></div>
+   </div>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="saveUser('${id||''}')">${t('save')}</button></div>`);
+}
+function saveUser(id){
+  const g=x=>document.getElementById(x).value.trim();
+  const nom=g('uNom'), username=g('uUser'), role=g('uRole'), actif=g('uActif')==='1', pass=document.getElementById('uPass').value;
+  if(!nom||!username){ alert(t('name')+' / '+t('username')+' ?'); return; }
+  const dup=(DB.users||[]).find(x=>x.username.toLowerCase()===username.toLowerCase() && x.id!==id);
+  if(dup){ alert(t('userExists')); return; }
+  if(id){
+    const u=DB.users.find(x=>x.id===id); if(!u)return;
+    u.nom=nom; u.username=username; u.role=role; u.actif=actif;
+    if(pass) u.pw=hashPwd(pass);
+  } else {
+    if(!pass){ alert(t('password')+' ?'); return; }
+    DB.users.push({id:'u'+Date.now(), nom, username, role, actif, pw:hashPwd(pass)});
+  }
+  save(); closeModal(); render();
+}
+function resetPw(id){
+  const u=DB.users.find(x=>x.id===id); if(!u)return;
+  const np=prompt(t('newPwFor')+' '+u.username+' :'); if(np===null||np==='')return;
+  u.pw=hashPwd(np); save(); alert(t('pwChanged'));
+}
+function delUser(id){
+  const u=DB.users.find(x=>x.id===id); if(!u)return;
+  if(u.id===USER.id){ alert(t('noSelfDel')); return; }
+  if(u.role==='admin' && DB.users.filter(x=>x.role==='admin').length<=1){ alert(t('lastAdmin')); return; }
+  if(confirm(t('confirmDel')+'\n\n'+u.nom+' ('+u.username+')')){ DB.users=DB.users.filter(x=>x.id!==id); save(); render(); }
+}
+
+/* -------- PARAMÈTRES -------- */
+function vSettings(v){
+  v.innerHTML=`<div class="panel"><h3>⚙️ ${t('settings')}</h3>
+    <div class="field"><label>${t('uiLang')}</label>
+      <div class="gap"><button class="btn ${LANG==='fr'?'':'btn-ghost'} btn-sm" onclick="setLang('fr')">Français</button>
+      <button class="btn ${LANG==='ar'?'':'btn-ghost'} btn-sm" onclick="setLang('ar')">العربية (RTL)</button></div>
+    </div>
+    <div class="field mt"><label>${t('theme')}</label>
+      <p style="color:var(--muted);font-size:13px">${t('allFilled')}<br>${t('total42')}</p></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
+    <button class="btn btn-ghost btn-sm" style="color:var(--bad);border-color:#fecaca" onclick="resetDB()">🗑️ ${t('resetData')}</button>
+  </div>
+  <div class="panel"><h3>🗄️ ${t('dataMgmt')}</h3>
+    <div class="gap">
+      <button class="btn btn-sm" onclick="exportExcel()">⬇ ${t('exportXlsx')}</button>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer;display:inline-flex;align-items:center">⬆ ${t('importXlsx')}
+        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])importExcel(this.files[0])"></label>
+    </div>
+    <p style="color:var(--muted);font-size:12px;margin-top:8px">${t('dataHint')}</p>
+  </div>
+  <div class="panel"><h3>👤 ${USER.name}</h3><p style="color:var(--muted)">${t('role')} : ${t(ROLE_LABEL[USER.role])} · ${t('username')} : ${USER.username||'—'}</p>
+    <button class="btn btn-ghost btn-sm mt" onclick="resetPw('${USER.id}')">🔑 ${t('myPassword')}</button></div>`;
+}
+
+/* ================= MODAL ================= */
+function showModal(html,wide){ document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this){if(typeof libRevoke==='function')libRevoke();closeModal()}"><div class="modal${wide?' wide':''}">${html}</div></div>`; }
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+
+/* ================= INIT ================= */
+load();
+setTheme(localStorage.getItem('ma_theme')==='dark'?'dark':'light');
+setLang(LANG);
+// précharge voix
+if(speechSynthesis) speechSynthesis.getVoices();
+</script>
+</body>
+</html>
