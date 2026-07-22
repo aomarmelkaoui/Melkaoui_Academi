@@ -190,7 +190,8 @@ html[data-theme="dark"] .opt{background:#0f172a}
 html[data-theme="dark"] .opt:hover{background:#243044}
 html[data-theme="dark"] .callout{background:#3a300f;border-color:#5a4a17;color:#fde68a}
 html[data-theme="dark"] .kpi .l,html[data-theme="dark"] .chart-box h4{color:#94a3b8}
-html[data-theme="dark"] .cert{filter:none}
+html[data-theme="dark"] .cert{color:#1b2733; --muted:#64748b}
+html[data-theme="dark"] .cert .name{color:#0d3b40}
 </style>
 </head>
 <body>
@@ -337,7 +338,7 @@ const I18N = {
     m_course:"Cours interactifs", m_lib:"Bibliothèque", m_quiz:"Quiz & exercices", m_ai:"Assistant IA", m_prompt:"Prompt Studio",
     m_form:"Formateurs", fQualif:"Statut / Qualification", fExp:"Expérience", fAssures:"Formations assurées", coordinator:"Coordination du programme",
     addFormateur:"Ajouter un formateur", fName:"Nom & Prénom", edit:"Modifier", del:"Supprimer", confirmDel:"Confirmer la suppression ?",
-    beneficiary:"Bénéficiaire", allEnrolled:"Tous les inscrits (de cette formation)", certDone:"certificat(s) généré(s)", certHint:"Choisissez une formation puis un bénéficiaire — ou « Tous les inscrits » pour générer en lot.",
+    beneficiary:"Bénéficiaire", allEnrolled:"Tous les inscrits (de cette formation)", certDone:"certificat(s) généré(s)", certHint:"Choisissez une formation puis un bénéficiaire — ou « Tous les inscrits » pour générer en lot.", certNumUsed:"Ce numéro de certificat existe déjà.",
     addFile:"Ajouter un fichier", files:"fichier(s)", noFiles:"Aucun fichier dans ce dossier. Ajoutez-en un.", open:"Ouvrir", folder:"Dossier", file:"Fichier", title:"Titre", optional:"(facultatif)",
     libHint:"Formats : PDF, audio, vidéo, image, Word, PowerPoint. Stocké localement dans votre navigateur.", libErr:"Erreur de stockage",
     courseMedia:"Médias de la formation (bibliothèque)", noCourseMedia:"Aucun audio ou vidéo dans le dossier de cette formation. Ajoutez-en dans la Bibliothèque :",
@@ -396,7 +397,7 @@ const I18N = {
     m_course:"الدروس التفاعلية", m_lib:"المكتبة", m_quiz:"الاختبارات", m_ai:"المساعد الذكي", m_prompt:"استوديو المطالبات",
     m_form:"المكوّنون", fQualif:"الصفة / المؤهل", fExp:"الخبرة", fAssures:"التكوينات المؤطَّرة", coordinator:"تنسيق البرنامج",
     addFormateur:"إضافة مكوّن", fName:"الاسم الكامل", edit:"تعديل", del:"حذف", confirmDel:"تأكيد الحذف؟",
-    beneficiary:"المستفيد", allEnrolled:"كل المسجّلين (في هذا التكوين)", certDone:"شهادة/شهادات مُوَلَّدة", certHint:"اختر تكوينا ثم مستفيدا — أو «كل المسجّلين» للتوليد بالجملة.",
+    beneficiary:"المستفيد", allEnrolled:"كل المسجّلين (في هذا التكوين)", certDone:"شهادة/شهادات مُوَلَّدة", certHint:"اختر تكوينا ثم مستفيدا — أو «كل المسجّلين» للتوليد بالجملة.", certNumUsed:"رقم الشهادة موجود مسبقا.",
     addFile:"إضافة ملف", files:"ملف/ملفات", noFiles:"لا توجد ملفات في هذا المجلد. أضف ملفا.", open:"فتح", folder:"المجلد", file:"الملف", title:"العنوان", optional:"(اختياري)",
     libHint:"الصيغ: PDF، صوت، فيديو، صورة، Word، PowerPoint. يُخزَّن محليا في متصفحك.", libErr:"خطأ في التخزين",
     courseMedia:"وسائط التكوين (من المكتبة)", noCourseMedia:"لا يوجد صوت أو فيديو في مجلد هذا التكوين. أضف ملفات في المكتبة:",
@@ -969,6 +970,28 @@ function genCerts(){
   save(); alert(n+' '+t('certDone')); render();
 }
 function delCert(num){ if(confirm(t('confirmDel'))){ DB.certificates=DB.certificates.filter(c=>c.num!==num); save(); render(); } }
+function editCert(num){
+  const c=DB.certificates.find(x=>x.num===num); if(!c)return;
+  const nm=(c.name||'').replace(/"/g,'&quot;');
+  showModal(`<button class="close" onclick="closeModal()">×</button><h3>✏️ ${t('edit')} — ${t('m_cert')}</h3>
+   <div class="grid2 mt">
+     <div class="field"><label>${t('beneficiary')}</label><input id="ecName" value="${nm}"></div>
+     <div class="field"><label>${t('formation')}</label><select id="ecForm">${FORMATIONS.map(f=>`<option value="${f.code}" ${f.code===c.fcode?'selected':''}>${f.code} · ${ftitle(f)}</option>`).join('')}</select></div>
+     <div class="field"><label>${t('certDate')}</label><input type="date" id="ecDate" value="${c.date||''}"></div>
+     <div class="field"><label>${t('certNo')}</label><input id="ecNum" value="${c.num}"></div>
+   </div>
+   <div class="gap mt right"><button class="btn btn-ghost btn-sm" onclick="closeModal()">${t('cancel')}</button>
+   <button class="btn btn-sm" onclick="saveCert('${num}')">${t('save')}</button></div>`);
+}
+function saveCert(num){
+  const c=DB.certificates.find(x=>x.num===num); if(!c)return;
+  const g=id=>document.getElementById(id).value.trim();
+  const newNum=g('ecNum')||c.num;
+  if(newNum!==c.num && DB.certificates.find(x=>x.num===newNum)){ alert(t('certNumUsed')); return; }
+  const nm=g('ecName'); if(!nm){ alert(t('beneficiary')+' ?'); return; }
+  c.name=nm; c.fcode=g('ecForm'); c.date=g('ecDate'); c.num=newNum;
+  save(); closeModal(); render();
+}
 function vCert(v){
   const mine=DB.certificates;
   v.innerHTML=`
@@ -1001,7 +1024,8 @@ function vCert(v){
       </div>
       <div class="right mt gap" style="justify-content:flex-end">
         <button class="btn btn-sm" onclick="printCert('cert_${c.num}')">🖨️ ${t('download')}</button>
-        ${canEdit()?`<button class="btn btn-ghost btn-sm" style="color:var(--bad)" onclick="delCert('${c.num}')">🗑️ ${t('del')}</button>`:''}
+        ${canEdit()?`<button class="btn btn-ghost btn-sm" onclick="editCert('${c.num}')">✏️ ${t('edit')}</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--bad)" onclick="delCert('${c.num}')">🗑️ ${t('del')}</button>`:''}
       </div>
     </div>`);
     list.appendChild(wrap);
